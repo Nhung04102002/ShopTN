@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Đơn hàng</title>
+  <div th:replace="admin/layout/head :: head"></div>
+</head>
+
+<body>
+<div th:replace="admin/layout/navbar :: navbar"></div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 shadow-sm" style="background-color: #f5ebeb;">
+      <h5 class="pt-2 pb-1 mt-4 mb-3"><i class="fa-solid fa-filter"></i> <b>Lọc theo</b></h5>
+      <div class="overF">
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Thời gian</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#quantity" aria-expanded="true" aria-controls="quantity"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2" id="quantity">
+            <ul class="list-group" id="timeFilter">
+              <li class="list-group-item border-0">
+                <input class="form-check-input me-1" type="radio" name="timeFilter" value="1"
+                       id="today" checked>
+                <label class="form-check-label" for="today">Hôm nay</label>
+              </li>
+              <li class="list-group-item border-0 py-0">
+                <input class="form-check-input me-1" type="radio" name="timeFilter" value="2"
+                       id="yesterday">
+                <label class="form-check-label" for="yesterday">Hôm qua</label>
+              </li>
+              <li class="list-group-item border-0">
+                <input class="form-check-input me-1" type="radio" name="timeFilter" value="3"
+                       id="anotherChoice">
+                <label class="form-check-label" for="anotherChoice">Lựa chọn khác</label>
+                <div>
+                  <div class="row align-items-center">
+                    <div class="col-2">
+                      <label for="dateStart" class="col-form-label">Từ</label>
+                    </div>
+                    <div class="col-10">
+                      <input type="date" id="dateStart" name="dateStart" class="form-control border-bottom"
+                             style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+                    </div>
+                  </div>
+                  <div class="row align-items-center">
+                    <div class="col-2">
+                      <label for="dateEnd" class="col-form-label">Tới</label>
+                    </div>
+                    <div class="col-10">
+                      <input type="date" id="dateEnd" name="dateEnd" class="form-control border-bottom"
+                             style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Người tạo</b></h6>
+          </div>
+          <select class="form-select shadow-sm rounded-2" id="creatorFilter" name="creatorFilter">
+            <option class="py-1 px-2 mt-1 rounded-1" value="" selected>Tất cả</option>
+            <option class="py-1 px-2 rounded-1" th:each="user : ${userList}" th:value="${user.id}" th:text="${user.name}"></option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Thanh toán bằng</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#supplier" aria-expanded="true" aria-controls="supplier"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white" id="supplier">
+            <div id="methodFilter" class="px-3 py-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="methodFilter" id="flexRadioDefault1" value="" checked>
+                <label class="form-check-label" for="flexRadioDefault1">Tất cả</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="methodFilter" id="flexRadioDefault2" value="0">
+                <label class="form-check-label" for="flexRadioDefault2">Tiền mặt</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="methodFilter" id="flexRadioDefault3" value="1">
+                <label class="form-check-label" for="flexRadioDefault3">Chuyển khoản</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Trạng thái</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#show" aria-expanded="true" aria-controls="show"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white" id="show">
+            <div id="statusFilter" class="px-3 py-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveTrue" value="" checked>
+                <label class="form-check-label" for="isActiveTrue">Đã hoàn thành</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveFalse" value="0">
+                <label class="form-check-label" for="isActiveFalse">Đã huỷ</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" value="3">
+                <label class="form-check-label">Tất cả</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-10" style="background-color: #f5ebeb;">
+      <div class="p-2">
+        <div class="container-fluid p-0 my-3">
+          <div class="row">
+            <div class="col">
+              <h3 class="m-0">Hoá đơn</h3>
+            </div>
+            <div class="col">
+              <div class="d-flex justify-content-between">
+                <form class="d-flex" role="search">
+                  <div class="input-group" style="min-width: 350px; max-width: 400px;">
+                   <span class="input-group-text bg-white" id="basic-addon1">
+                     <i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input class="form-control border-start-0 ps-0" type="search" id="keyword" name="keyword"
+                           th:value="${keyword}" placeholder="Mã hoá đơn, tên khách hàng"
+                           aria-label="Search">
+                  </div>
+                  <a th:href="@{/admin/invoice}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+                </form>
+
+                <a th:href="@{/admin/invoice/sell}" class="btn btn-success" type="button" style="min-width: 124px;">
+                  <i class="bi bi-plus-circle-fill me-2"></i>Thêm mới</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table class="table m-0 align-middle">
+          <thead>
+          <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+            <th class="col-1 text-center">Mã hoá đơn</th>
+            <th class="col-2">Thời gian</th>
+            <th class="col-2">Khách hàng</th>
+            <th class="col-2 text-end">Tổng tiền hàng</th>
+            <th class="col-1 text-end">Giảm giá</th>
+            <th class="col-2 text-end">Trạng thái</th>
+            <th class="col-2 text-center">Chức năng</th>
+          </tr>
+          </thead>
+        </table>
+        <div class="tableScroll" style="overflow-y: scroll; height: 479px;overscroll-behavior: contain;">
+          <table class="table table-hover table-striped align-middle" style="--bs-table-hover-bg: rgba(238,186,48,0.5);"
+                 role="grid">
+            <colgroup>
+              <col class="col-1 text-center">
+              <col class="col-2">
+              <col class="col-2">
+              <col class="col-2 text-end">
+              <col class="col-1 text-end">
+              <col class="col-2 text-end">
+              <col class="col-2 text-center">
+            </colgroup>
+            <thead th:if="${currentPage == 1 && totalItems!=0}">
+            <tr style="--bs-table-bg: rgba(238,186,48,0.2);">
+              <th colspan="3"></th>
+              <th class="text-end" colspan="1" th:text="${#numbers.formatCurrency(sumTotalAmount)}"></th>
+              <th class="text-end" colspan="1" th:text="${#numbers.formatCurrency(sumDiscount)}"></th>
+              <th colspan="2"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="invoice : ${invoices}">
+              <td class="text-center" th:text="${invoice[0]}"></td>
+              <td  th:text="${#dates.format(invoice[1], 'dd/MM/yyyy HH:mm:ss')}"></td>
+              <td th:text="${invoice[2]}"></td>
+              <td class="text-end" th:text="${#numbers.formatCurrency(invoice[3])}"></td>
+              <td class="text-end" th:text="${#numbers.formatCurrency(invoice[4])}"></td>
+              <td class="text-end" th:if="${invoice[5] == 1}">Đã hoàn thành</td>
+              <td class="text-end" th:if="${invoice[5] == 0}">Đã huỷ</td>
+              <td class="text-center">
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Xem">
+                    <a class="btn text-primary px-1 sBtn" th:href="@{/admin/invoice/findInvoice(invoiceID=${invoice[6]})}"><i
+                            class="bi bi-info-circle-fill"></i></a>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Huỷ" th:if="${invoice[5] != 0}">
+                      <a th:href="@{/admin/invoice/findInvoice(invoiceID=${invoice[6]})}" class="btn text-danger px-1 delBtn"><i class="fa-solid fa-ban"></i></a>
+                </span>
+
+              </td>
+            </tr>
+            <tr th:if="${totalItems==0}">
+              <th class="text-center" colspan="7">Không tìm thấy kết quả nào phù hợp</th>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex mt-3">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination" th:if="${totalItems > 0}">
+              <li class="page-item" th:if="${currentPage > 1}"><a class="page-link" th:href="@{'?pageNo='+${currentPage - 1}}"><i class="fa-solid fa-angle-left"></i></a></li>
+              <li class="page-item" th:each="i:${#numbers.sequence(1, totalPage)}" th:classappend="${currentPage == i ? 'active' : ''}">
+                <a class="page-link"
+                   th:href="@{'?'+ ${timeFilter != null && timeFilter != ''? 'timeFilter='+timeFilter+'&':''}+
+                   ${dateStart != null && dateStart != ''? 'dateStart='+dateStart+'&':''}+
+                   ${dateEnd != null && dateEnd != ''? 'dateEnd='+dateEnd+'&':''}+
+                   ${creatorFilter != null && creatorFilter != ''? 'creatorFilter='+creatorFilter+'&':''}+
+                   ${methodFilter != null && methodFilter != ''? 'methodFilter='+methodFilter+'&':''}+
+                   ${statusFilter != '1' && statusFilter != null? 'statusFilter='+statusFilter+'&':''}+
+                   ${keyword != null && keyword != ''? 'keyword='+keyword+'&':''}+
+                   'pageNo='+${i}}"
+                >[[${i}]]</a>
+              </li>
+              <li class="page-item" th:if="${currentPage < totalPage}"><a class="page-link" th:href="@{'?pageNo='+${currentPage + 1}}"><i class="fa-solid fa-angle-right"></i></a></li>
+            </ul>
+          </nav>
+          <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) < totalItems}" th:text="'Hiển thị '+((${currentPage}-1)*10+1)+' - '+(${currentPage} * 10)+' / Tổng số '+${totalItems}+' hàng'"></p>
+          <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) >= totalItems}" th:text="'Hiển thị ' + ${totalItems} + ' / Tổng số ' + ${totalItems} + ' hàng'"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!--Xem chi tiết hoá đơn-->
+<div class="modal fade" id="showInvoiceModal" tabindex="-1" aria-labelledby="showInvoiceLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+        <p class="modal-title fs-6 fw-normal text-white" id="showInvoiceLabel"></p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="m-1">
+          <div class="row">
+            <div class="col">
+              <div class="row ms-1 border-bottom mb-3">
+                <div class="col-5 p-0">Mã hoá đơn:</div>
+                <div class="col-7"><p class="m-0" id="getCode" name="code"></p></div>
+              </div>
+
+              <div class="row ms-1 border-bottom mb-3">
+                <div class="col-5 p-0">Thời gian:</div>
+                <div class="col-7"><p class="m-0" id="getTime" name="time"></p></div>
+              </div>
+
+              <div class="row ms-1 border-bottom mb-3">
+                <div class="col-5 p-0">Khách hàng:</div>
+                <div class="col-7"><p class="m-0" id="getCusName" name="customer.customerName"></p></div>
+              </div>
+
+            </div>
+            <div class="col-1"></div>
+            <div class="col">
+              <div class="row me-1 border-bottom mb-3">
+                <div class="col-5 p-0">Trạng thái:</div>
+                <div class="col-7"><p class="m-0" id="getStatus" name="status"></p></div>
+              </div>
+
+              <div class="row me-1 border-bottom mb-3">
+                <div class="col-5 p-0">Người tạo:</div>
+                <div class="col-7"><p class="m-0" id="getCreator" name="user.name"></p></div>
+              </div>
+
+              <div class="row me-1 border-bottom mb-3">
+                <div class="col-5 p-0">Thanh toán bằng:</div>
+                <div class="col-7"><p class="m-0" id="getMethod" name="paymentMethod"></p></div>
+              </div>
+            </div>
+          </div>
+
+          <table class="table table-striped m-0 align-middle">
+            <thead>
+            <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+              <th class="col-2">Mã hàng</th>
+              <th class="col-3">Tên hàng</th>
+              <th class="col-1 text-end">SL</th>
+              <th class="col-2 text-end">Giá bán</th>
+              <th class="col-2 text-end">Giảm giá</th>
+              <th class="col-2 text-end">Thành tiền</th>
+            </tr>
+            </thead>
+            <tbody id="iDetails">
+
+            </tbody>
+          </table>
+
+          <div class="row mt-3">
+            <div class="col-8"></div>
+            <div class="col-4">
+              <div class="row mt-2">
+                <div class="col-6 text-end">Tổng số lượng:</div>
+                <div class="col-6 text-end" id="totalQuantity"></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6 text-end">Tổng tiền hàng:</div>
+                <div class="col-6 text-end" id="amount"></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6 text-end">Giảm giá:</div>
+                <div class="col-6 text-end" id="discount"></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6 text-end">Tiền phải trả:</div>
+                <div class="col-6 text-end" id="totalAmount"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Xoá -->
+<div class="modal fade" id="deleteProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteProductLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteProductLabel">Xác nhận huỷ hoá đơn</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="delProduct"></p>
+      </div>
+      <div class="modal-footer">
+        <a href="" id="deleted" class="btn btn-danger"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" th:inline="javascript">
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+  $(document).ready(function (){
+
+    $('.sBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $.get(href, function (invoice){
+        $('#getCode').text(invoice.code);
+        $('#getTime').text(moment(invoice.time).format('DD/MM/YYYY HH:mm:ss'));
+        $('#getCusName').text(invoice.customer.customerName);
+        if (invoice.status === 1){
+          $('#getStatus').text('Đã hoàn thành');
+        } else {
+          $('#getStatus').text('Đã huỷ');
+        }
+
+        $('#getCreator').text(invoice.user.name);
+        if (invoice.paymentMethod === 0){
+          $('#getMethod').text('Tiền mặt');
+        } else {
+          $('#getMethod').text('Chuyển khoản');
+        }
+        const formatter = new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        });
+        $('#showInvoiceLabel').text('Chi tiết hoá đơn '+ invoice.code);
+        [[${totalIds}]].forEach(total => {
+          if (total[0] === invoice.code && total[4] === invoice.invoiceID) {
+            $('#totalQuantity').text(total[1]);
+            $('#amount').text(formatter.format(total[2]));
+            $('#discount').text(formatter.format(total[3]));
+            $('#totalAmount').text(formatter.format(total[2] - total[3]));
+          }
+        })
+
+        $('#iDetails').empty();
+        const iDetails = [[${invoiceDetails}]];
+
+        iDetails.forEach(ids => {
+          if(ids[6] === invoice.code && ids[7] === invoice.invoiceID) {
+            $('#iDetails').append(`
+            <tr>
+              <td>${ids[0]}</td>
+              <td>${ids[1]}</td>
+              <td class="text-end">${ids[2]}</td>
+              <td class="text-end">${formatter.format(ids[3])}</td>
+              <td class="text-end">${formatter.format(ids[4])}</td>
+              <td class="text-end">${formatter.format(ids[5])}</td>
+            </tr>`);
+          }
+        })
+        if ($('#iDetails tr').length === 0) {
+          $('#iDetails').append(`
+            <tr>
+              <th class="text-center" colSpan="6">Không có thông tin chi tiết của đơn hàng này</th>
+            </tr>`);
+        }
+      });
+      $('#showInvoiceModal').modal('show');
+    });
+
+
+    $('.delBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $.get(href, function (invoice){
+        $('#deleted').attr('href', '/admin/invoice/cancel/' + invoice.invoiceID);
+        $('#deleteProduct #delProduct').text('Hệ thống sẽ huỷ hoá đơn ' + invoice.code + ' và cập nhật lại số lượng hàng hoá. Bạn có chắc chắn muốn huỷ?');
+      });
+      $('#deleteProduct').modal('show');
+    });
+
+    $("#today, #yesterday, #anotherChoice").change(function() {
+      $("#dateStart").val('');
+      $("#dateEnd").val('');
+      filterData();
+    });
+
+    $("#dateStart").change(function() {
+      if (new Date($("#dateStart").val()).getFullYear() >= 2023){
+        filterData();
+      }
+    });
+
+    $("#dateEnd").change(function() {
+      if (new Date($("#dateEnd").val()).getFullYear() >= 2023){
+        filterData();
+      }
+    });
+
+    $("#keyword").keyup(function (event){
+      if (event.key === "Enter") {
+        filterData();
+      }
+    })
+
+    $("#methodFilter div input, #statusFilter div input, #creatorFilter").change(function() {
+      filterData();
+    });
+
+    function filterData() {
+      const timeFilter = $('input[name="timeFilter"]:checked').val();
+      const dateStart = $("#dateStart").val();
+      const dateEnd = $("#dateEnd").val();
+      const methodFilter = $('input[name="methodFilter"]:checked').val();
+      const statusFilter = $('input[name="statusFilter"]:checked').val();
+      const creatorFilter = $("#creatorFilter").val();
+      const keyword = $("#keyword").val();
+
+      const url = "/admin/invoice?pageNo=1" +
+              (keyword ? "&keyword=" + keyword : "") +
+              (creatorFilter ? "&creatorFilter=" + creatorFilter : "") +
+              (timeFilter ? "&timeFilter=" + timeFilter : "") +
+              (dateStart ? "&dateStart=" + dateStart : "") +
+              (dateEnd ? "&dateEnd=" + dateEnd : "") +
+              (methodFilter ? "&methodFilter=" + methodFilter : "") +
+              (statusFilter ? "&statusFilter=" + statusFilter : "");
+      window.location.replace(url);
+    }
+    $(window).on('load', function() {
+      const params = new URLSearchParams(window.location.search);
+      let timeFilter = params.get('timeFilter');
+      const dateStart = params.get('dateStart');
+      const dateEnd = params.get('dateEnd');
+      const methodFilter = params.get('methodFilter');
+      const statusFilter = params.get('statusFilter');
+      const keyword = params.get('keyword');
+      const creatorFilter = params.get('creatorFilter');
+
+      if (timeFilter == null || timeFilter === ''){ timeFilter = "1";}
+
+      if(timeFilter === "1"){
+        $("#today").prop('checked', true);
+        $("#yesterday").prop('checked', false);
+        $("#anotherChoice").prop('checked', false);
+      } else if (timeFilter === "2"){
+        $("#yesterday").prop('checked', true);
+        $("#today").prop('checked', false);
+        $("#anotherChoice").prop('checked', false);
+      } else {
+        $("#anotherChoice").prop('checked', true);
+        $("#today").prop('checked', false);
+        $("#yesterday").prop('checked', false);
+      }
+
+      $('input[name="methodFilter"][value="' + methodFilter + '"]').prop('checked', true);
+      $('input[name="statusFilter"][value="' + statusFilter + '"]').prop('checked', true);
+      $("#dateStart").val(dateStart);
+      $("#dateEnd").val(dateEnd);
+      $("#keyword").val(keyword);
+      $("#creatorFilter").val(creatorFilter);
+    });
+  });
+</script>
+</body>
+</html>

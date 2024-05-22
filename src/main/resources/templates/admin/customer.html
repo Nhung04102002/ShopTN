@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Khách hàng</title>
+  <div th:replace="admin/layout/head :: head"></div>
+</head>
+<body>
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 shadow-sm" style="background-color: #f5ebeb;">
+      <h5 class="pt-2 pb-1 mt-4 mb-3"><i class="fa-solid fa-filter"></i> <b>Lọc theo</b></h5>
+      <div class="overF">
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Sinh nhật</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#dob" aria-expanded="true" aria-controls="dob"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white" id="dob">
+            <ul class="list-group" id="dobFilter">
+              <li class="list-group-item border-0 pb-0">
+                <input class="form-check-input me-1" type="radio" name="dobFilter" value="1"
+                       id="allDOB" checked>
+                <label class="form-check-label" for="allDOB">Tất cả</label>
+              </li>
+              <li class="list-group-item border-0 pt-0">
+                <input class="form-check-input me-1" type="radio" name="dobFilter" value="2"
+                       id="anotherChoice">
+                <label class="form-check-label" for="anotherChoice">Lựa chọn khác</label>
+                <div>
+                  <div class="row align-items-center">
+                    <div class="col-2">
+                      <label for="dobStart" class="col-form-label">Từ</label>
+                    </div>
+                    <div class="col-10">
+                      <input type="date" id="dobStart" name="dobStart" class="form-control border-bottom" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+                    </div>
+                  </div>
+                  <div class="row align-items-center">
+                    <div class="col-2">
+                      <label for="dobEnd" class="col-form-label">Tới</label>
+                    </div>
+                    <div class="col-10">
+                      <input type="date" id="dobEnd" name="dobEnd" class="form-control border-bottom" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Tổng bán</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#totalPurchase" aria-expanded="true" aria-controls="totalPurchase"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white px-3 py-2" id="totalPurchase">
+
+            <div class="row align-items-center">
+              <div class="col-2">
+                <label for="amountStart" class="col-form-label">Từ</label>
+              </div>
+              <div class="col-10">
+                <input type="text" name="amountStart" id="amountStart" min="0" class="form-control border-bottom" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+              </div>
+            </div>
+            <div class="row align-items-center">
+              <div class="col-2">
+                <label for="amountEnd" class="col-form-label">Tới</label>
+              </div>
+              <div class="col-10">
+                <input type="text" name="amountEnd" id="amountEnd" min="0" class="form-control border-bottom" style="border-bottom-left-radius: 0px;border-bottom-right-radius: 0px; border: 0;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Giới tính</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#gender" aria-expanded="true" aria-controls="show"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white" id="gender">
+            <div id="genderFilter" class="px-3 py-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="genderFilter" id="flexRadioDefault1" value="" checked>
+                <label class="form-check-label" for="flexRadioDefault1">Tất cả</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="genderFilter" id="flexRadioDefault2" value="1">
+                <label class="form-check-label" for="flexRadioDefault2">Nam</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="genderFilter" id="flexRadioDefault3" value="2">
+                <label class="form-check-label" for="flexRadioDefault3">Nữ</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+               style="background-color: rgba(161,58,58,0.5);">
+            <h6 class="m-1"><b>Trạng thái</b></h6>
+            <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#show" aria-expanded="true" aria-controls="show"><i
+                    class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="collapse show shadow-sm rounded-2 bg-white" id="show">
+            <div id="statusFilter" class="px-3 py-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveTrue" value="" checked>
+                <label class="form-check-label" for="isActiveTrue">Đang hoạt động</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveFalse" value="2">
+                <label class="form-check-label" for="isActiveFalse">Ngừng hoạt động</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="statusFilter" value="3">
+                <label class="form-check-label">Tất cả</label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-10" style="background-color: #f5ebeb;">
+      <div class="p-2">
+        <div class="container-fluid p-0 my-3">
+          <div class="row">
+            <div class="col">
+              <h3 class="m-0">Khách hàng</h3>
+            </div>
+            <div class="col">
+              <div class="d-flex justify-content-between">
+                <form class="d-flex" role="search">
+                  <div class="input-group" style="min-width: 350px; max-width: 400px;">
+                    <span class="input-group-text border-end-0 bg-white" id="basic-addon1">
+                      <i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input class="form-control border-start-0 ps-0" type="search" name="keyword" id="keyword"
+                           th:value="${keyword}" placeholder="Mã, tên khách hàng, SĐT, email, địa chỉ"
+                           aria-label="Search">
+                  </div>
+                  <a th:href="@{/admin/customer}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+                </form>
+
+                <button class="btn btn-success nBtn" type="button" style="min-width: 124px;">
+                  <i class="bi bi-plus-circle-fill me-2"></i>Thêm mới</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table class="table m-0 align-middle">
+          <thead>
+          <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+            <th class="col-2 ps-4">Mã khách hàng</th>
+            <th class="col-3">Tên khách hàng</th>
+            <th class="col-1 text-center">Ngày sinh</th>
+            <th class="col-1 text-center">Giới tính</th>
+            <th class="col-2">Số điện thoại</th>
+            <th class="col-1 text-end">Tổng bán</th>
+            <th class="col-2 text-center">Chức năng</th>
+          </tr>
+          </thead>
+        </table>
+        <div class="tableScroll" style="overflow-y: scroll; height: 479px;overscroll-behavior: contain;">
+          <table class="table table-hover table-striped align-middle" style="--bs-table-hover-bg: rgba(238,186,48,0.5);"
+                 role="grid">
+            <colgroup>
+              <col class="col-2">
+              <col class="col-3">
+              <col class="col-1 text-center">
+              <col class="col-1 text-center">
+              <col class="col-2">
+              <col class="col-1 text-end">
+              <col class="col-2 text-center">
+            </colgroup>
+            <thead>
+            <tr style="--bs-table-bg: rgba(238,186,48,0.2);">
+              <th colspan="5" class="ps-4" th:text="${totalItems} + ' khách hàng'"></th>
+              <th class="text-end" colspan="1" th:text="${#numbers.formatCurrency(totalAmount)}"></th>
+              <th colspan="1"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr id="listCus" th:each="customer : ${customerList}" th:if="${customer[6] == 1 || customer[6] == 2}">
+              <td class="ps-4" th:text="${customer[0]}"></td>
+              <td th:text="${customer[1]}"></td>
+              <td class="text-center" th:text="${#dates.format(customer[2], 'dd/MM/yyyy')}"></td>
+              <td class="text-center" th:text="${customer[3] == 1 ? 'Nam' : 'Nữ'}"></td>
+              <td th:text="${customer[4]}"></td>
+              <td class="text-end" th:text="${#numbers.formatCurrency(customer[5])}"></td>
+              <td class="text-center">
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Xem">
+                    <a class="btn text-primary px-1 sBtn" th:href="@{/admin/customer/findCustomerID(customerID=${customer[0]})}"><i
+                            class="bi bi-info-circle-fill"></i></a>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Sửa">
+                    <a class="btn text-success px-1 eBtn" th:href="@{/admin/customer/findCustomerID(customerID=${customer[0]})}">
+                        <i class="bi bi-pencil-square"></i></a>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Ngừng hoạt động" th:if="${customer[6] == 1}">
+                      <a th:href="@{/admin/customer/findCustomerID(customerID=${customer[0]})}" class="btn text-secondary px-1 deactivatedBtn">
+                          <i class="fa-solid fa-toggle-on"></i></a>
+                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Đang hoạt động" th:if="${customer[6] == 2}">
+                                            <a th:href="@{'/admin/customer/activate/' + ${customer[0]}}" class="btn text-secondary px-1">
+                                                <i class="fa-solid fa-toggle-off"></i></a>
+                                </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                      data-bs-title="Xoá">
+                                            <a th:href="@{/admin/customer/findCustomerID(customerID=${customer[0]})}" class="btn text-danger px-1 delBtn"><i class="bi bi-trash3"></i></a>
+                                </span>
+
+              </td>
+            </tr>
+            <tr th:if="${totalItems==0}">
+              <th class="text-center" colspan="7">Không tìm thấy kết quả nào phù hợp</th>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex mt-3">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination" th:if="${totalItems > 0}">
+              <li class="page-item" th:if="${currentPage > 1}"><a class="page-link" th:href="@{'?pageNo='+${currentPage - 1}}"><i class="fa-solid fa-angle-left"></i></a></li>
+              <li class="page-item" th:each="i:${#numbers.sequence(1, totalPage)}" th:classappend="${currentPage == i ? 'active' : ''}">
+                <a class="page-link"
+                   th:href="@{'?'+ ${dobFilter != null && dobFilter != ''? 'dobFilter='+dobFilter+'&':''}+
+                   ${dobStart != null && dobStart != ''? 'dobStart='+dobStart+'&':''}+
+                   ${dobEnd != null && dobEnd != ''? 'dobEnd='+dobEnd+'&':''}+
+                   ${genderFilter != null && genderFilter != ''? 'genderFilter='+genderFilter+'&':''}+
+                   ${amountStart != null && amountStart != ''? 'amountStart='+amountStart+'&':''}+
+                   ${amountEnd != null && amountEnd != ''? 'amountEnd='+amountEnd+'&':''}+
+                   ${statusFilter != '1' && statusFilter != null? 'statusFilter='+statusFilter+'&':''}+
+                   ${keyword != null && keyword != ''? 'keyword='+keyword+'&':''}+
+                   'pageNo='+${i}}"
+                >[[${i}]]</a>
+              </li>
+              <li class="page-item" th:if="${currentPage < totalPage}"><a class="page-link" th:href="@{'?pageNo='+${currentPage + 1}}"><i class="fa-solid fa-angle-right"></i></a></li>
+            </ul>
+          </nav>
+          <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) < totalItems}" th:text="'Hiển thị '+((${currentPage}-1)*10+1)+' - '+(${currentPage} * 10)+' / Tổng số '+${totalItems}+' hàng'"></p>
+          <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) >= totalItems}" th:text="'Hiển thị ' + ${totalItems} + ' / Tổng số ' + ${totalItems} + ' hàng'"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Xem thông tin khách hàng -->
+<div class="modal fade" id="showCustomerModal" tabindex="-1" aria-labelledby="showCustomerLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.2);">
+        <div class="modal-title" id="showCustomerLabel">
+          <ul class="nav nav-pills" id="myTab" role="tablist">
+            <li class="nav-item me-2" role="presentation">
+              <button class="btn btn-tab active" id="info-tab" data-bs-toggle="pill" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">Thông tin</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="btn btn-tab" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">Lịch sử giao dịch</button>
+            </li>
+          </ul>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-5">
+        <div class="tab-content" style="min-height: 350px;" id="myTabContent">
+          <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Mã khách hàng:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerID" name="customerID"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Tên khách hàng:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerName" name="customerName"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Số điện thoại:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerPhone" name="phone"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Email:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerEmail" name="email"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Ngày sinh:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerDOB" name="dob"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Giới tính:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerGender" name="gender"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Địa chỉ:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <p class="m-0" id="getCustomerAddress" name="address"></p>
+              </div>
+            </div>
+            <div class="mb-3 row border-bottom">
+              <div class="col-sm-3 ps-0">
+                <p class="m-0">Ghi chú:</p>
+              </div>
+              <div class="col-sm-9 ps-0">
+                <textarea type="text" class="m-0 w-100 border-0" rows="3" id="getCustomerDescription" name="description" readonly></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
+            <table class="table m-0 align-middle">
+              <thead>
+              <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+                <th class="col-2 ps-4">Mã hoá đơn</th>
+                <th class="col-3">Thời gian</th>
+                <th class="col-2 text-end">Trạng thái</th>
+                <th class="col-3 text-end">Hình thức trả</th>
+                <th class="col-2 text-end">Tổng tiền</th>
+              </tr>
+              </thead>
+            </table>
+            <div class="tableScroll" style="overflow-y: scroll; height: 300px;overscroll-behavior: contain;">
+              <table class="table table-striped align-middle" role="grid">
+                <colgroup>
+                  <col class="col-2">
+                  <col class="col-3">
+                  <col class="col-2 text-end">
+                  <col class="col-3 text-end">
+                  <col class="col-2 text-end">
+                </colgroup>
+                <tbody id="historyCus">
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Thêm/Sửa khách hàng -->
+<div class="modal fade" id="addEditCustomer" tabindex="-1" aria-labelledby="addEditCustomerLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <form th:action="@{/admin/customer/save}" method="post">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+          <p class="modal-title fs-6 fw-normal text-white" id="addEditCustomerLabel"></p>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control" id="inputCustomerID"  name="customerID" style="display: none;">
+
+          <div class="mb-3 row">
+            <label for="inputCustomerName" class="col-sm-3 col-form-label">Tên khách hàng<span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="inputCustomerName" name="customerName">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerPhone" class="col-sm-3 col-form-label">Số điện thoại <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-9">
+              <input type="tel" class="form-control" id="inputCustomerPhone" name="phone" pattern="[0]{1}[0-9]{9}">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerGender" class="col-sm-3 col-form-label">Giới tính<span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-9">
+              <select class="form-select" id="inputCustomerGender" name="gender" required>
+                <option value=1>Nam</option>
+                <option value=2>Nữ</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerDOB" class="col-sm-3 col-form-label">Ngày sinh <span
+                    class="text-danger">*</span></label>
+            <div class="col-sm-9">
+              <input type="date" class="form-control" id="inputCustomerDOB" name="dob" required>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="inputCustomerAddress" name="address">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerEmail" class="col-sm-3 col-form-label">Email</label>
+            <div class="col-sm-9">
+              <input type="email" class="form-control" id="inputCustomerEmail"  name="email">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="inputCustomerDescription" class="col-sm-3 col-form-label">Ghi chú</label>
+            <div class="col-sm-9">
+                            <textarea type="text" class="form-control" id="inputCustomerDescription"
+                                      rows="3" name="description"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <label for="inputCustomerStatus" class="col-sm-3 col-form-label">Trạng thái</label>
+            <div class="col-sm-9">
+              <select class="form-select" id="inputCustomerStatus" name="isEnable">
+                <option value=1 selected>Đang hoạt động</option>
+                <option value=2>Không hoạt động</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                  class="bi bi-x-circle me-2"></i>Đóng
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Ngừng hoạt động -->
+<div class="modal fade" id="discontinue" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="discontinueLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+        <p class="modal-title fs-6 fw-normal text-white" id="discontinueLabel">Xác nhận ngừng hoạt động</p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="m-0" id="stopCustomer"></p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <a href="" class="btn btn-danger btn-sm" id="deactivated"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Xoá -->
+<div class="modal fade" id="deleteCustomer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteCustomerLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+        <p class="modal-title fs-6 fw-normal text-white" id="deleteCustomerLabel">Xác nhận xoá khách hàng</p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="m-0" id="delCustomer"></p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+  /* Tooltip */
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+  /* Toast */
+  const toastTrigger = document.getElementById('liveToastBtn')
+  const toastLiveExample = document.getElementById('liveToast')
+  if (toastTrigger) {
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+    toastTrigger.addEventListener('click', () => {
+      toastBootstrap.show()})
+  }
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+
+  $(document).ready(function (){
+    const formatter = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    });
+    const config = {
+      decimalCharacter: ',',
+      digitGroupSeparator: '.',
+      decimalPlaces: 0,
+      showWarnings: false,
+      hoverDecimals: 0
+    };
+    const amountStart1 = new AutoNumeric('#amountStart', config);
+    const amountEnd1 = new AutoNumeric('#amountEnd', config);
+    $('.sBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $.get(href, function (customer){
+        const formattedDate = new Date(customer.dob).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        $('#getCustomerID').text(customer.customerID);
+        $('#getCustomerName').text(customer.customerName);
+        $('#getCustomerPhone').text(customer.phone);
+        $('#getCustomerAddress').text(customer.address);
+        $('#getCustomerEmail').text(customer.email);
+        $('#getCustomerDOB').text(formattedDate);
+        $('#getCustomerGender').text(customer.gender === 1 ? 'Nam' : 'Nữ');
+        $('#getCustomerDescription').val(customer.description);
+
+        $('#historyCus').empty();
+        const historyTrans = [[${historyTrans}]];
+        historyTrans.forEach(invoice => {
+          if(invoice[5] === customer.customerID && invoice[0] !== null) {
+            const formattedDate = new Date(invoice[1]).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedCurrency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(invoice[4]);
+            $('#historyCus').append(`
+            <tr>
+              <td class="ps-4">${invoice[6]}</td>
+              <td>${formattedDate}</td>
+              <td class="text-end">${invoice[2] === 1 ? 'Hoàn thành' : 'Đã huỷ'}</td>
+              <td class="text-end">${invoice[3] === 1 ? 'Chuyển khoản' : 'Tiền mặt'}</td>
+              <td class="text-end">${formattedCurrency}</td>
+            </tr>`);
+          }
+        })
+        if ($('#historyCus tr').length === 0) {
+          $('#historyCus').append(`
+            <tr>
+              <th class="text-center" colSpan="5">Không có lịch sử giao dịch của khách hàng này</th>
+            </tr>`);
+        }
+
+      });
+
+      $('#showCustomerModal').modal('show');
+    });
+
+    $('.nBtn, .eBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      const hasPencilIcon = $(this).find('.bi-pencil-square').length > 0;
+      if (hasPencilIcon) {
+        $.get(href, function (customer){
+          $('#addEditCustomerLabel').text('Cập nhật thông tin khách hàng');
+          const dobDate = new Date(customer.dob);
+          const dobString = dobDate.getFullYear() + '-' + ('0' + (dobDate.getMonth() + 1)).slice(-2) + '-' + ('0' + dobDate.getDate()).slice(-2);
+          $('#inputCustomerID').val(customer.customerID);
+          $('#inputCustomerName').val(customer.customerName);
+          $('#inputCustomerPhone').val(customer.phone);
+          $('#inputCustomerDOB').val(dobString);
+          $('#inputCustomerGender').val(customer.gender);
+          $('#inputCustomerAddress').val(customer.address);
+          $('#inputCustomerEmail').val(customer.email);
+          $('#inputCustomerDescription').val(customer.description);
+          $('#inputCustomerStatus').val(customer.isEnable);
+
+        });
+        $('#addEditCustomer').modal('show');
+      }
+      else{
+        $('#addEditCustomerLabel').text('Thêm khách hàng');
+        $('#inputCustomerID').val('');
+        $('#inputCustomerName').val('');
+        $('#inputCustomerPhone').val('');
+        $('#inputCustomerDOB').val('');
+        $('#inputCustomerGender').val(1);
+        $('#inputCustomerAddress').val('');
+        $('#inputCustomerEmail').val('');
+        $('#inputCustomerDescription').val('');
+        $('#inputCustomerStatus').val(1);
+        $('#addEditCustomer').modal('show');
+      }
+    });
+
+    $('.deactivatedBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $.get(href, function (customer){
+        $('#deactivated').attr('href', '/admin/customer/deactivate/' + customer.customerID);
+        $('#discontinue #stopCustomer').text('Bạn có chắc chắn muốn ngừng hoạt động khách hàng ' + customer.customerName + '? Thông tin và giao dịch với khách hàng này vẫn sẽ được giữ.');
+      });
+      $('#discontinue').modal('show');
+    });
+
+    $('.delBtn').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $.get(href, function (customer){
+        $('#deleted').attr('href', '/admin/customer/delete/' + customer.customerID);
+        $('#deleteCustomer #delCustomer').text('Hệ thống sẽ xóa hoàn toàn khách hàng ' + customer.customerName + ' nhưng vẫn giữ những giao dịch lịch sử nếu có. Bạn có chắc chắn muốn xóa?');
+      });
+      $('#deleteCustomer').modal('show');
+    });
+
+    $("#allDOB, #anotherChoice").change(function() {
+      $("#dobStart").val('');
+      $("#dobEnd").val('');
+      filterData();
+    });
+
+    $("#dobStart").change(function() {
+      if (new Date($("#dobStart").val()).getFullYear() >= 1930){
+        filterData();
+      }
+    });
+
+    $("#dobEnd").change(function() {
+      if (new Date($("#dobEnd").val()).getFullYear() >= 1930){
+        filterData();
+      }
+    });
+
+    $("#keyword").keyup(function (event){
+      if (event.key === "Enter") {
+        filterData();
+      }
+    })
+
+    $("#genderFilter div input, #statusFilter div input, #amountStart, #amountEnd").change(function() {
+      filterData();
+    });
+
+    function filterData() {
+      const dobFilter = $('input[name="dobFilter"]:checked').val();
+      const dobStart = $("#dobStart").val();
+      const dobEnd = $("#dobEnd").val();
+      const amountStart = parseInt($("#amountStart").val().replace(/\./g, ''));
+      const amountEnd = parseInt($("#amountEnd").val().replace(/\./g, ''));
+      const genderFilter = $('input[name="genderFilter"]:checked').val();
+      const statusFilter = $('input[name="statusFilter"]:checked').val();
+      const keyword = $("#keyword").val();
+
+      const url2 = "/admin/customer?pageNo=1" +
+              (keyword ? "&keyword=" + keyword : "") +
+              (dobFilter ? "&dobFilter=" + dobFilter : "") +
+              (dobStart ? "&dobStart=" + dobStart : "") +
+              (dobEnd ? "&dobEnd=" + dobEnd : "") +
+              (amountStart ? "&amountStart=" + amountStart : "") +
+              (amountEnd ? "&amountEnd=" + amountEnd : "") +
+              (genderFilter ? "&genderFilter=" + genderFilter : "") +
+              (statusFilter ? "&statusFilter=" + statusFilter : "");
+      window.location.replace(url2);
+    }
+    $(window).on('load', function() {
+      const params = new URLSearchParams(window.location.search);
+      let dobFilter = params.get('dobFilter');
+      const dobStart = params.get('dobStart');
+      const dobEnd = params.get('dobEnd');
+      const amountStart = params.get('amountStart');
+      const amountEnd = params.get('amountEnd');
+      const genderFilter = params.get('genderFilter');
+      const statusFilter = params.get('statusFilter');
+      const keyword = params.get('keyword');
+
+      if (dobFilter == null || dobFilter === ''){ dobFilter = "1";}
+
+      if (dobFilter === "1") {
+        $("#allDOB").prop('checked', true);
+        $("#anotherChoice").prop('checked', false);
+      } else {
+        $("#allDOB").prop('checked', false);
+        $("#anotherChoice").prop('checked', true);
+      }
+
+      $('input[name="genderFilter"][value="' + genderFilter + '"]').prop('checked', true);
+      $('input[name="statusFilter"][value="' + statusFilter + '"]').prop('checked', true);
+      $("#dobStart").val(dobStart);
+      $("#dobEnd").val(dobEnd);
+      $("#keyword").val(keyword);
+      amountStart1.set(amountStart);
+      amountEnd1.set(amountEnd);
+      $("#amountStart").val(amountStart1.getFormatted());
+      $("#amountEnd").val(amountEnd1.getFormatted());
+    });
+
+    if ([[${messageSuccess}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+    }
+    if ([[${messageFail}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+    }
+  });
+
+</script>
+</html>

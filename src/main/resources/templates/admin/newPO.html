@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nhập hàng</title>
+    <div th:replace="admin/layout/head :: head"></div>
+    <link rel="stylesheet" th:href="@{/css/admin/newInvoice.css}">
+</head>
+<style>
+  .search input {
+    width: 30%;
+    outline: 0;
+  }
+  .result-box{
+    position: absolute;
+    flex: 1;
+    width: 30%;
+  }
+
+  .result-box .result{
+    border-top: 1px solid #999;
+    padding: 0px;
+    max-height: 600px;
+    overflow-y: scroll;
+  }
+  #result::-webkit-scrollbar-track
+  {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    background-color: #F5F5F5;
+  }
+
+  #result::-webkit-scrollbar
+  {
+    width: 6px;
+    background-color: #F5F5F5;
+  }
+
+  #result::-webkit-scrollbar-thumb
+  {
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+    background-color: #C68888;
+  }
+
+  .result-box .result .row{
+    padding: 15px 10px;
+    cursor: pointer;
+    margin: 0;
+  }
+  .result-box .result .row:hover {
+    background: #e9f3ff;
+  }
+  .tag-container {
+    border: 1px solid #dee2e6;
+    padding: 5px;
+    border-radius: 0.375rem;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .tag-container .tag {
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    background: #f2f2f2;
+    cursor: default;
+  }
+
+  .tag i {
+    font-size: 16px;
+    margin-left: 5px;
+  }
+  .tag span {
+    white-space: nowrap;
+  }
+  .tag-container input {
+    flex: 1;
+    font-size: 16px;
+    padding: 5px;
+    outline: none;
+    border: 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+</style>
+<body>
+  <div th:replace="admin/layout/navbar :: navbar"></div>
+  <div class="container-fluid">
+    <div class="row" style="height: 91.9vh;">
+      <div class="col-md-9" style="background-color: #f5ebeb;">
+        <div class="mt-3 mx-3">
+          <div class="search-box mb-3">
+            <div class="search input-group" style="width: 46%;">
+              <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input class="form-control border-start-0 ps-0" type="text" name="" id="input-box" autocomplete="off"
+                     placeholder="Mã hàng, mã vạch, tên hàng">
+              <button class="btn btn-secondary nBtn" type="button"
+                      style="background-color: rgba(161,58,58,0.5); border: none">
+                <i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="result-box rounded bg-white ">
+
+            </div>
+          </div>
+          <div class="align-items-center py-2 px-0 mb-2 rounded bg-white"
+               style="border: 1px solid rgba(161,58,58,0.5); display:grid; grid-template-columns: 5% 10% 25% 10% 6% 13% 13% 13% 5%;">
+            <div class="text-center"><button class="cart-count btn rounded-circle btn-sm py-0 px-2" disabled th:text="${COUNT}" style="opacity: initial;">0
+            </button></div>
+            <div >Mã hàng</div>
+            <div >Tên hàng</div>
+            <div >ĐVT</div>
+            <div class="text-end">SL</div>
+            <div class="text-end">Đơn giá</div>
+            <div class="text-end">Giảm giá</div>
+            <div class="text-end">Thành tiền</div>
+            <div class="text-center"><a th:href="@{/admin/PurchaseOrder/new/clear}" class="btn btn-outline-danger border-0"><i
+                    class="bi bi-trash3"></i></a></div>
+          </div>
+
+            <div th:each="item : ${CART_ITEMS}">
+              <form th:action="@{/admin/PurchaseOrder/new/update}" method="post">
+                <input type="hidden" name="id" th:value="${item.productId}">
+                <div class="align-items-center py-2 px-0 mb-2 rounded bg-white"
+                     style="border: 1px solid rgba(161,58,58,0.5); display:grid; grid-template-columns: 5% 10% 25% 10% 6% 13% 13% 13% 5%;">
+            <div class="text-center" th:text="${item.itemNumber}"></div>
+            <div th:text="${item.barcode}"></div>
+            <div class="truncate-text" th:text="${item.name}"></div>
+            <div th:text="${item.unit}"></div>
+            <div class="text-end quantity-container num-container">
+              <input type="number" th:value="${item.quantity}" name="quantity" onblur="this.form.submit()" min="1"
+                     class="border-bottom text-end border-0 w-100 quantity-input"></div>
+            <div class="text-end num-container">
+              <input type="text" th:value="${item.cogs}" name="cogs" onblur="this.form.submit()" min="0"
+                     class="border-bottom text-end border-0 w-75 cogs-input"></div>
+            <div class="text-end num-container">
+              <input type="text" th:value="${item.discount}" name="discountItem" min="0" onblur="this.form.submit()"
+                     class="border-bottom text-end border-0 w-75 discount-input"></div>
+            <div class="text-end totalAmountItem" th:text="${#numbers.formatDecimal(item.cogs * item.quantity - item.discount, 0, 'POINT', 0, 'COMMA')}"></div>
+            <div class="text-center"><a th:href="@{/admin/PurchaseOrder/new/del/{id}(id=${item.productId})}"
+                                        class="btn btn-outline-danger border-0"><i class="bi bi-trash3"></i></a></div>
+                </div>
+              </form>
+            </div>
+        </div>
+
+
+      </div>
+      <div class="col-md-3 shadow-sm" style="background-color: #f5ebeb;">
+        <h3 class="mx-0 my-3">Lập phiếu nhập</h3>
+        <form th:action="@{/admin/PurchaseOrder/new/import}" method="post" th:object="${newPO}">
+        <div class="py-2 px-0 mb-2 rounded bg-white"
+             style="border: 1px solid rgba(161,58,58,0.5);">
+          <input type="number" th:value="${TOTAL}" name="totalAmount" style="display: none;">
+          <div class="row px-3 mb-2 mt-1">
+            <div class="col-5">Mã phiếu nhập</div>
+            <div class="col-7 text-end" th:text="${nextPOId}"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Người lập</div>
+            <div class="col-7 text-end" th:text="${loggedInUser.name}"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Thời gian lập</div>
+            <div class="col-7 text-end" th:text="${#dates.format(#calendars.createNow(), 'dd/MM/yyyy HH:mm:ss')}"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-12">Nhà cung cấp</div>
+            <div class="col-12">
+              <div class="input-group rounded" style="border: 1px solid rgba(161,58,58,0.5);">
+                <input type="text" class="form-control border-0" placeholder="Tìm nhà cung cấp..." list="supList" th:field="*{supplier}" required>
+                <button class="btn btn-outline-secondary border-0 nBtnSup" type="button"><i class="fa-solid fa-circle-plus"></i></button>
+              </div>
+              <datalist id="supList">
+                <option th:each="sup:${sList}" th:if="${sup.isEnable != 0}"
+                        th:value="${sup.supplierID}"
+                        th:text="${sup.supplierName+' - '+sup.phone}"></option>
+              </datalist>
+            </div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Trạng thái</div>
+            <div class="col-7 text-end">Phiếu tạm</div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Tổng tiền hàng</div>
+            <div class="col-7 text-end cart-total" th:text="${#numbers.formatDecimal(TOTAL, 0, 'POINT', 0, 'COMMA')}"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Giảm giá</div>
+            <div class="col-7 text-end discountAll">
+              <input type="text" value="0" name="discountAll" style="margin-right: -2px;"
+                     class="border-bottom text-end" min="0"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5">Cần trả NCC</div>
+            <div class="col-7 text-end mustPay"></div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-12">Trạng thái thanh toán</div>
+            <div class="col-12" id="getStatusPay">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" th:field="*{statusPay}" id="statusPay0" value="0" checked>
+                <label class="form-check-label" for="statusPay0">Chưa thanh toán</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" th:field="*{statusPay}" id="statusPay1" value="1">
+                <label class="form-check-label" for="statusPay1">Đã thanh toán</label>
+              </div>
+              <div class="row">
+                <div class="col-7">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" th:field="*{statusPay}" id="statusPay2" value="2">
+                    <label class="form-check-label" for="statusPay2">Thanh toán một phần</label>
+                  </div>
+                </div>
+                <div class="col-5">
+                  <input type="text" value="0" name="amountPaidText" style="display: none; margin-right: -2px;"
+                         class="border-bottom text-end border-0 amountPaid w-100" min="0">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-12">Phương thức thanh toán</div>
+            <div class="col-12" id="methodPay">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" th:field="*{paymentMethod}" id="method1" value="0" checked>
+                <label class="form-check-label" for="method1">Tiền mặt</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" th:field="*{paymentMethod}" id="method2" value="1">
+                <label class="form-check-label" for="method2">Chuyển khoản</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <select class="form-select form-select-md mt-2" th:field="*{account}" style="display: none;">
+                <option value="" selected>Chọn tài khoản ngân hàng</option>
+                <option th:each="acc:${accList}" th:value="${acc.getAccNumber()}"
+                        th:text="${acc.getAccOwner()+' - '+acc.getAccNumber()+' | '+acc.getBank().getBankName()}"></option>
+              </select>
+            </div>
+          </div>
+          <div class="row px-3 mb-2">
+            <div class="col-5"><button class="btn btn-secondary w-100 mt-2" type="submit" name="action" value="saveTemp">Lưu tạm</button></div>
+            <div class="col-7"><button class="btn btn-success w-100 mt-2" type="submit" name="action" value="saveAndUpdate">Hoàn thành</button></div>
+          </div>
+
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!--Thêm thông tin hàng hoá-->
+  <div class="modal fade" id="addEditProduct" tabindex="-1" aria-labelledby="addEditProductLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+      <form th:action="@{/admin/PurchaseOrder/new/saveP}" method="post" enctype="multipart/form-data" id="saveForm">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+            <h1 class="modal-title fs-5 fw-normal text-white" id="addEditProductLabel"></h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-sm-7">
+                <div class="mb-3 row">
+                  <label for="inputImage" class="col-sm-3 col-form-label">Hình ảnh</label>
+                  <div class="col-sm-9">
+                    <input type="file" class="form-control" id="inputImage" name="fileImage" accept="image/png, image/jpeg">
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputProductID" class="col-sm-3 col-form-label">Mã hàng</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputProductID" name="barcode" placeholder="Mã tự động">
+                    <input type="text" style="display: none;" class="form-control" id="inputID" name="productID">
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputProductName" class="col-sm-3 col-form-label">Tên hàng <span
+                          class="text-danger">*</span></label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputProductName" name="productName" required>
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputCategory" class="col-sm-3 col-form-label  ">Nhóm hàng <span
+                          class="text-danger">*</span></label>
+                  <div class="col-sm-9">
+                    <div class="input-group search_select_box">
+                      <select class="form-select" id="inputCategory" name="category.categoryID" required>
+                        <option value="" selected>Chọn nhóm hàng</option>
+                        <option th:each="cList: ${categoryList}" th:text="${cList.categoryName}" th:value="${cList.categoryID}"></option>
+                      </select>
+                      <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addNewCategory"><i class="bi bi-plus-circle"></i></button>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputProperties" class="col-sm-3 col-form-label  ">Thuộc tính</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="inputProperties" name="properties">
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputBrand" class="col-sm-3 col-form-label">Thương hiệu</label>
+                  <div class="col-sm-9">
+                    <input type="text" list="brands" class="form-control" id="inputBrand" name="brand">
+                    <datalist id="brands">
+                      <option th:each="brand: ${brandList}" th:value="${brand}">
+                    </datalist>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-sm-5">
+                <div class="mb-3" style="height: 145px; display: flex; justify-content: center; align-items: center; background-color: #f5ebeb;">
+                  <img id="thumbnail" src="/images/image0.jpg" alt="imagePreview" width="100px"></div>
+                <div class="mb-3 row">
+                  <label for="inputPrice" class="col-sm-4 col-form-label">Giá bán</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control text-end" id="inputPrice" name="price1">
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="inputMinQuantity" class="col-sm-4 col-form-label">Tồn tối thiểu</label>
+                  <div class="col-sm-8">
+                    <input type="number" class="form-control text-end" id="inputMinQuantity" name="minQuantity" min="0">
+                  </div>
+                </div>
+
+                <div class="row">
+                  <label for="inputUnit" class="col-sm-4 col-form-label">Đơn vị tính</label>
+                  <div class="col-sm-8">
+                    <input type="text" list="units" class="form-control" id="inputUnit" name="unit">
+                    <datalist id="units">
+                      <option th:each="unit: ${unitList}" th:value="${unit}">
+                    </datalist>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputLocation" class="col-sm-2 col-form-label">Vị trí</label>
+              <div class="col-sm-10 ps-0" style="margin-left: -4px;">
+                <div class="tag-container">
+                  <input id="inputLocation1">
+                </div>
+                <input type="text" style="display: none;" class="form-control" id="inputLocation" name="location">
+              </div>
+            </div>
+            <div class="row">
+              <label for="inputDescription" class="col-sm-2 col-form-label">Mô tả</label>
+              <div class="col-sm-10 ps-0" style="margin-left: -4px;">
+                <textarea type="text" class="form-control" id="inputDescription" rows="3" name="description"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                    class="bi bi-x-circle me-2"></i>Đóng
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Thêm nhà cung cấp -->
+  <div class="modal fade" id="addEditSupplier" tabindex="-1" aria-labelledby="addEditSupplierLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+      <form th:action="@{/admin/PurchaseOrder/new/supplier/save}" method="post">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+            <p class="modal-title fs-6 fw-normal text-white" id="addEditSupplierLabel"></p>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="text" class="form-control" id="inputSupplierID"  name="supplierID" style="display: none;">
+
+            <div class="mb-3 row">
+              <label for="inputSupplierName" class="col-sm-3 col-form-label">Tên nhà cung cấp <span
+                      class="text-danger">*</span></label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="inputSupplierName" name="supplierName">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputSupplierGroup" class="col-sm-3 col-form-label">Nhóm nhà cung cấp</label>
+              <div class="col-sm-9">
+                <select class="form-select" id="inputSupplierGroup" name="parentID">
+                  <option value="" selected>Chọn nhóm nhà cung cấp</option>
+                  <option th:each="group : ${listGroup}"
+                          th:value="${group.supplierID}" th:text="${group.supplierName}"></option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputSupplierPhone" class="col-sm-3 col-form-label">Số điện thoại <span
+                      class="text-danger">*</span></label>
+              <div class="col-sm-9">
+                <input type="tel" class="form-control" id="inputSupplierPhone"  name="phone" pattern="[0]{1}[0-9]{9}">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputSupplierAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="inputSupplierAddress" name="address">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputSupplierEmail" class="col-sm-3 col-form-label">Email</label>
+              <div class="col-sm-9">
+                <input type="email" class="form-control" id="inputSupplierEmail"  name="email">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="inputSupplierDescription" class="col-sm-3 col-form-label">Ghi chú</label>
+              <div class="col-sm-9">
+                            <textarea type="text" class="form-control" id="inputSupplierDescription"
+                                      rows="3" name="description"></textarea>
+              </div>
+            </div>
+            <div class="row">
+              <label for="inputSupplierStatus" class="col-sm-3 col-form-label">Trạng thái</label>
+              <div class="col-sm-9">
+                <select class="form-select" id="inputSupplierStatus" name="isEnable">
+                  <option value=1 selected>Đang hoạt động</option>
+                  <option value=2>Không hoạt động</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                    class="bi bi-x-circle me-2"></i>Đóng
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Thông báo thành công -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  <!-- Thông báo thất bại -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" th:inline="javascript">
+    let availableKeywords = [[${searchP}]];
+    const resultsBox = document.querySelector(".result-box");
+    const inputBox = document.getElementById("input-box");
+
+    inputBox.onkeyup = function(){
+      let result = [];
+      let input = inputBox.value;
+      if (input.length){
+        result = availableKeywords.filter((keyword) => {
+          return keyword.barcode.toLowerCase().includes(input.toLowerCase()) || keyword.productName.toLowerCase().includes(input.toLowerCase());
+        });
+      }
+      display(result);
+      if (!result.length){
+        resultsBox.innerHTML = '';
+      }
+    }
+
+    function display(result){
+      const content = result.map((list)=>{
+        const imagePath = list.image ? '/images/' + list.productID + '/' + list.image : '/images/image0.jpg';
+        const item = `
+                    <div class="row" onclick=selectInput(${list.productID})>
+                      <div class="col-2"><img src="${imagePath}" width="40"></div>
+                      <div class="col-7">
+                        <p class="m-0">${list.barcode}</p>
+                        <p class="m-0">${list.productName}</p>
+                      </div>
+                      <div class="col-3">
+                        <p class="m-0">SL : ${list.quantity}</p>
+                        <p class="m-0">Giá: ${list.cogs}</p>
+                      </div>
+                    </div>
+                `;
+        return item;
+      });
+      resultsBox.innerHTML = '<div class="result" id="result">' + content.join('') + "</div>";
+    }
+
+    function selectInput(id){
+      var url = "/admin/PurchaseOrder/new/add/" + id;
+      resultsBox.innerHTML = '';
+      window.location.replace(url);
+    }
+
+    $("#methodPay div input").change(function (){
+      showAccInput();
+    });
+    function showAccInput(){
+      const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+      if (paymentMethod === "0"){ // Chú ý so sánh với chuỗi "0" thay vì số 0
+        $('#account').removeAttr('required');
+        $('#account').css('display', 'none'); // Ẩn phần tử
+        $('#account').val('');
+      } else {
+        $('#account').prop('required', true);
+        $('#account').css('display', 'block'); // Hiển thị phần tử
+      }
+    }
+
+    $("#getStatusPay div input").change(function (){
+      showAmountPaidInput();
+    });
+    function showAmountPaidInput(){
+      const statusPay = $('input[name="statusPay"]:checked').val();
+      if (statusPay === "0" || statusPay === "1"){
+        $('.amountPaid').removeAttr('required');
+        $('.amountPaid').css('display', 'none'); // Ẩn phần tử
+        $('.amountPaid').val('');
+      } else {
+        $('.amountPaid').prop('required', true);
+        $('.amountPaid').css('display', 'block'); // Hiển thị phần tử
+      }
+    }
+
+    const config = {
+      decimalCharacter: ',',
+      digitGroupSeparator: '.',
+      decimalPlaces: 0,
+      showWarnings: false,
+      hoverDecimals: 0
+    };
+    function formatNumber(number) {
+      return number.toLocaleString('vi-VN');
+    }
+
+    const cogsInputs = document.querySelectorAll('.cogs-input');
+    cogsInputs.forEach(input => {
+      new AutoNumeric(input, config);
+    });
+    const discountItemInputs = document.querySelectorAll('.discount-input');
+    discountItemInputs.forEach(input => {
+      new AutoNumeric(input, config);
+    });
+    const discountAllInput = new AutoNumeric(('.discountAll input'), config);
+    const amountPaid = new AutoNumeric(('.amountPaid'), config);
+
+    const cartTotal = $('.cart-total').text().replace(/\./g, '');
+    const mustPay = $('.mustPay');
+
+    if (sessionStorage.getItem('discountAll')){
+      discountAllInput.set(sessionStorage.getItem('discountAll'));
+    }
+    if (parseFloat(cartTotal) === 0){
+      discountAllInput.set(0);
+      sessionStorage.setItem("discountAll", "0");
+    }
+    function updateMustPay() {
+      const discountAll = AutoNumeric.getNumber('.discountAll input');
+      if (parseFloat(discountAll) === 0) {
+        mustPay.text(formatNumber(Number(cartTotal)));
+      } else {
+        mustPay.text(formatNumber(Number(cartTotal) - parseFloat(discountAll)));
+      }
+    }
+
+    updateMustPay();  // Cập nhật giá trị mustPay ban đầu
+
+    $('.discountAll input').on('blur', function() {
+      const discountAll = AutoNumeric.getNumber('.discountAll input');
+      if (isNaN(parseFloat(discountAll))) {
+        discountAllInput.set(0);  // Gán lại giá trị mặc định nếu không phải là số
+        return;
+      }
+      updateMustPay();
+      sessionStorage.setItem("discountAll", discountAll);
+    });
+
+
+    const tagContainer = document.querySelector('.tag-container');
+    const input = document.querySelector('.tag-container input');
+    var tags = [];
+    function createTag(label) {
+      const div = document.createElement('div');
+      div.setAttribute('class', 'tag');
+      const span = document.createElement('span');
+      span.innerHTML = label;
+      const closeBtn = document.createElement('i');
+      closeBtn.setAttribute('class', 'fa-solid fa-xmark');
+      closeBtn.setAttribute('data-item', label);
+      div.appendChild(span);
+      div.appendChild(closeBtn);
+      return div;
+    }
+
+    function reset() {
+      document.querySelectorAll('.tag').forEach(function (tag) {
+        tag.parentElement.removeChild(tag);
+      })
+    }
+
+    function addTags() {
+      reset();
+      tags.slice().reverse().forEach(function (tag) {
+        const input = createTag(tag);
+        tagContainer.prepend(input);
+      })
+    }
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && input.value.trim() !== null && input.value.trim() !== '') {
+        e.preventDefault(); // Ngăn chặn hành động mặc định của nút Enter
+        tags.push(input.value.trim()); // Thêm thẻ vào mảng, loại bỏ khoảng trắng đầu cuối
+        addTags();
+        input.value = '';
+
+        let string = '';
+        tags.forEach((item, index) => {
+          string += item;
+          if (index !== tags.length - 1) {
+            string += '|';
+          }
+        });
+        $('#inputLocation').val(string);
+        console.log('add', string);
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.tagName === 'I') {
+        const value = e.target.getAttribute('data-item');
+        const index = tags.indexOf(value);
+        tags = [...tags.slice(0, index), ...tags.slice(index + 1)];
+        addTags();
+        let string = '';
+        tags.forEach((item, index) => {
+          string += item;
+          if (index !== tags.length - 1) {
+            string += '|';
+          }
+        });
+        $('#inputLocation').val(string);
+        console.log('delete', string);
+      }
+    })
+
+    $(document).ready(function () {
+      const priceInput = new AutoNumeric('#inputPrice', config);
+
+      $('.nBtn').on('click', function (event) {
+        event.preventDefault();
+        $('#addEditProductLabel').text('Thêm hàng hoá');
+        $('#inputID').val('');
+        $('#inputProductID').val('');
+        $('#inputProductName').val('');
+        $('#inputPrice').val('');
+        $('#inputMinQuantity').val(0);
+        $('#inputUnit').val('');
+        $('#inputBrand').val('');
+        $('#inputCategory').val('');
+        $('#inputProperties').val('');
+        $('#inputLocation').val();
+        $('#inputDescription').val('');
+        $('#inputImage').val('');
+        $('#thumbnail').attr('src', '/images/image0.jpg');
+        $('#addEditProduct').modal('show');
+      });
+    });
+
+    $('.nBtnSup').on('click', function (event){
+      event.preventDefault();
+      const href = $(this).attr('href');
+      $('#addEditSupplierLabel').text('Thêm nhà cung cấp');
+      $('#inputSupplierID').val('');
+      $('#inputSupplierName').val('');
+      $('#inputSupplierPhone').val('');
+      $('#inputSupplierAddress').val('');
+      $('#inputSupplierEmail').val('');
+      $('#inputSupplierDescription').val('');
+      $('#inputSupplierStatus').val(1);
+      $('#inputSupplierGroup').val('');
+      $('#addEditSupplier').modal('show');
+    });
+
+    if ([[${messageSuccess}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+    }
+    if ([[${messageFail}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+    }
+  </script>
+</body>
+</html>

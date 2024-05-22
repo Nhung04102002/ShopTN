@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý người dùng</title>
+    <div th:replace="admin/layout/head :: head"></div>
+</head>
+
+<body>
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 shadow-sm" style="background-color: #f5ebeb;">
+            <h5 class="pt-2 pb-1 mt-4 mb-3"><i class="fa-solid fa-filter"></i> <b>Lọc theo</b></h5>
+            <div class="overF">
+                <div class="mb-3">
+                    <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+                         style="background-color: rgba(161,58,58,0.5);">
+                        <h6 class="m-1"><b>Vai trò</b></h6>
+                        <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#debt" aria-expanded="true" aria-controls="debt"><i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+<!--                    <select class="form-select multiple overflow-hidden shadow-sm rounded-2" th:size="${#lists.size(rolesList) + 2}" th:style="'height: ' + (100 * ${#lists.size(rolesList)}) / 2 + 'px;'" id="roleFilter" name="roleFilter">-->
+<!--                        <option class="py-1 px-2 mt-1 rounded-1" value="" selected>Tất cả</option>-->
+<!--                        <option class="py-1 px-2 rounded-1" th:each="role : ${rolesList}" th:value="${role}" th:text="${role}"></option>-->
+<!--                    </select>-->
+                    <div class="collapse show shadow-sm rounded-2 bg-white" id="debt">
+                        <div id="roleFilter" class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="roleFilter" value="" checked>
+                                <label class="form-check-label">Tất cả</label>
+                            </div>
+                            <div class="form-check" th:each="role : ${rolesList}">
+                                <input class="form-check-input" type="radio" name="roleFilter" th:value="${role}">
+                                <label class="form-check-label" th:text="${role}"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+                         style="background-color: rgba(161,58,58,0.5);">
+                        <h6 class="m-1"><b>Trạng thái</b></h6>
+                        <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#show" aria-expanded="true" aria-controls="show"><i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <div class="collapse show shadow-sm rounded-2 bg-white" id="show">
+                        <div id="statusFilter" class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveTrue" value="1" checked>
+                                <label class="form-check-label" for="isActiveTrue">Đang hoạt động</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveFalse" value="2">
+                                <label class="form-check-label" for="isActiveFalse">Vô hiệu hoá</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" value="1,2">
+                                <label class="form-check-label">Tất cả</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-10" style="background-color: #f5ebeb;">
+            <div class="p-2">
+                <div class="container-fluid p-0 my-3">
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="m-0">Quản lý người dùng</h3>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex justify-content-between">
+                                <form class="d-flex" role="search">
+                                    <div class="input-group" style="min-width: 350px; max-width: 400px;">
+                                        <span class="input-group-text border-end-0 bg-white" id="basic-addon1"><i
+                                                class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input class="form-control border-start-0 ps-0" type="search" id="search"
+                                               name="keyword" th:value="${keyword}" aria-label="Search"
+                                               placeholder="Tên người dùng, email, SĐT, địa chỉ">
+                                    </div>
+                                    <a th:href="@{/admin/account}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+
+                                </form>
+
+                                <button class="btn btn-success nBtn" type="button" style="min-width: 124px;">
+                                    <i class="bi bi-plus-circle-fill me-2"></i>Thêm mới</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <table class="table m-0 align-middle">
+                    <thead>
+                    <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+                        <th class="col-1"></th>
+                        <th class="col-2">Tên đăng nhập</th>
+                        <th class="col-3">Tên người dùng</th>
+                        <th class="col-2 text-end">Số điện thoại</th>
+                        <th class="col-2 text-end">Trạng thái</th>
+                        <th class="col-2 text-center">Chức năng</th>
+                    </tr>
+                    </thead>
+                </table>
+                <div class="tableScroll" style="overflow-y: scroll; height: 479px;overscroll-behavior: contain;">
+                    <table class="table table-hover table-striped align-middle" style="--bs-table-hover-bg: rgba(238,186,48,0.5);"
+                           role="grid">
+                        <colgroup>
+                            <col class="col-1 text-center">
+                            <col class="col-2">
+                            <col class="col-3">
+                            <col class="col-2 text-end">
+                            <col class="col-2 text-end">
+                            <col class="col-2 text-center">
+                        </colgroup>
+                        <tbody>
+                        <tr th:each="account, rowNum : ${accountList}" th:if="${account.isEnable == 1 || account.isEnable == 2}">
+                            <td class="text-center" th:text="${rowNum.index + 1}"></td>
+                            <td th:text="${account.email}"></td>
+                            <td th:text="${account.name}"></td>
+                            <td class="text-end" th:text="${account.phone}"></td>
+                            <td class="text-end" th:if="${account.isEnable == 1}">Đang hoạt động</td>
+                            <td class="text-end" th:if="${account.isEnable == 2}">Không hoạt động</td>
+                            <td class="text-center">
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Xem">
+                                    <a class="btn text-primary px-1 showBtn" th:href="@{/admin/account/findUserID(userID=${account.id})}"><i
+                                            class="bi bi-info-circle-fill"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Sửa">
+                                    <a class="btn text-success px-1 eBtn" th:href="@{/admin/account/findUserID(userID=${account.id})}">
+                                        <i class="bi bi-pencil-square"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Vô hiệu hoá" th:if="${account.isEnable == 1}">
+                                            <a th:href="@{/admin/account/findUserID(userID=${account.id})}" class="btn text-secondary px-1 deactivatedBtn">
+                                                <i class="fa-solid fa-toggle-on"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Đang hoạt động" th:if="${account.isEnable == 2}">
+                                            <a th:href="@{'/admin/account/activate/' + ${account.id}}" class="btn text-secondary px-1">
+                                                <i class="fa-solid fa-toggle-off"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Xoá">
+                                            <a th:href="@{/admin/account/findUserID(userID=${account.id})}" class="btn text-danger px-1 delBtn"><i class="bi bi-trash3"></i></a>
+                                </span>
+
+                            </td>
+                        </tr>
+                        <tr th:if="${totalItems==0}">
+                            <th class="text-center" colspan="6">Không tìm thấy kết quả nào phù hợp</th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex mt-3">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination" th:if="${totalItems > 0}">
+                            <li class="page-item" th:if="${currentPage > 1}"><a class="page-link" th:href="@{'?pageNo='+${currentPage - 1}}"><i class="fa-solid fa-angle-left"></i></a></li>
+                            <li class="page-item" th:each="i:${#numbers.sequence(1, totalPage)}" th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link"
+                                   th:href="@{'?'+ ${keyword != null && keyword != ''? 'keyword='+keyword+'&':''}+
+                                           ${roleFilter != null && roleFilter != ''? 'roleFilter='+roleFilter+'&':''}+
+                                           ${statusFilter != '1' && statusFilter != null? 'statusFilter='+statusFilter+'&':''}+'pageNo='+${i}}">[[${i}]]</a>
+                            </li>
+                            <li class="page-item" th:if="${currentPage < totalPage}"><a class="page-link" th:href="@{'?pageNo='+${currentPage + 1}}"><i class="fa-solid fa-angle-right"></i></a></li>
+                        </ul>
+                    </nav>
+                    <p class="m-2" th:if="${totalItems >= 5 && (currentPage * 5) < totalItems}" th:text="'Hiển thị '+((${currentPage}-1)*5+1)+' - '+(${currentPage} * 5)+' / Tổng số '+${totalItems}+' hàng'"></p>
+                    <p class="m-2" th:if="${totalItems >= 5 && (currentPage * 5) >= totalItems}" th:text="'Hiển thị ' + ${totalItems} + ' / Tổng số ' + ${totalItems} + ' hàng'"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Xem thông tin người dùng -->
+<div class="modal fade" id="showUserModal" tabindex="-1" aria-labelledby="showUserLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.2);">
+                <div class="modal-title" id="showUserLabel">
+                    <ul class="nav nav-pills" id="myTab" role="tablist">
+                        <li class="nav-item me-2" role="presentation">
+                            <button class="btn btn-tab active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab" aria-controls="info-tab-pane" aria-selected="true">Thông tin</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="btn btn-tab" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="false">Phân quyền</button>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5">
+                <div class="tab-content" style="min-height: 350px;" id="myTabContent">
+                    <div class="tab-pane fade show active" id="info-tab-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-4 ps-0">
+                                <p class="m-0">Tên người dùng:</p>
+                            </div>
+                            <div class="col-sm-8 ps-0">
+                                <p class="m-0" id="getUserName" name="name"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-4 ps-0">
+                                <p class="m-0">Số điện thoại:</p>
+                            </div>
+                            <div class="col-sm-8 ps-0">
+                                <p class="m-0" id="getUserPhone" name="phone"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-4 ps-0">
+                                <p class="m-0">Email:</p>
+                            </div>
+                            <div class="col-sm-8 ps-0">
+                                <p class="m-0" id="getUserEmail" name="email"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-4 ps-0">
+                                <p class="m-0">Địa chỉ:</p>
+                            </div>
+                            <div class="col-sm-8 ps-0">
+                                <p class="m-0" id="getUserAddress" name="address"></p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
+                        <p>Phân quyền...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Thêm/Sửa người dùng -->
+<div class="myForm">
+    <form th:action="@{/admin/account/save}" method="post">
+        <div class="modal fade" id="addEditUser" tabindex="-1" aria-labelledby="addEditUserLabel" aria-hidden="true"
+             data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                        <p class="modal-title fs-6 fw-normal text-white" id="addEditLabel"></p>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" class="form-control" id="inputUserID" name="id" value="" style="display: none;">
+                        <div class="mb-3 row">
+                            <label for="inputUserName" class="col-sm-3 col-form-label">Tên người dùng <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputUserName" name="name" value="" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserEmail" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="email" class="form-control" id="inputUserEmail" name="email" value="" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserPw" class="col-sm-3 col-form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <input type="password" class="form-control border-end-0" id="inputUserPw" name="password" value="" required>
+                                    <span class="input-group-text border-start-0 bg-white">
+                                        <button type="button" class="border-0 bg-white" onclick="showPassword()"><i id="pwEye" class="bi bi-eye-slash"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserRePw" class="col-sm-3 col-form-label">Nhập lại mật khẩu <span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <input type="password" class="form-control border-end-0" name="RePassword" id="inputUserRePw" value="" required>
+                                    <span class="input-group-text border-start-0 bg-white">
+                                        <button type="button" class="border-0 bg-white" onclick="showRePassword()"><i id="rePwEye" class="bi bi-eye-slash"></i></button>
+                                    </span>
+                                </div>
+                                <small id="passwordMatchMessage" class="form-text text-danger" style="display:none;">Mật khẩu không trùng khớp.</small>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserPhone" class="col-sm-3 col-form-label">Số điện thoại <span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <input type="tel" class="form-control" id="inputUserPhone" pattern="[0]{1}[0-9]{9}"
+                                       name="phone" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputUserAddress" name="address">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="inputUserRole" class="col-sm-3 col-form-label">Vai trò <span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <select class="form-select" id="inputUserRole" name="role" required>
+                                    <option value="" selected>Chọn vai trò</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="USER">USER</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="inputUserStatus" class="col-sm-3 col-form-label">Trạng thái</label>
+                            <div class="col-sm-9">
+                                <select class="form-select" id="inputUserStatus" name="isEnable">
+                                    <option value=1 selected>Đang hoạt động</option>
+                                    <option value=2>Không hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                                class="bi bi-x-circle me-2"></i>Đóng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- Ngừng hoạt động -->
+<div class="modal fade" id="discontinue" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="discontinueLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <p class="modal-title fs-6 fw-normal text-white" id="discontinueLabel">Xác nhận ngừng hoạt động</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="m-0" id="stopUserName"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <a href="" class="btn btn-danger btn-sm" id="deactivated"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Xoá -->
+<div class="modal fade" id="deleteUser" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteUserLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <p class="modal-title fs-6 fw-normal text-white" id="deleteUserLabel">Xác nhận xoá người dùng</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="m-0" id="delUserName"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    /* Tooltip */
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    /* Toast */
+    const toastTrigger = document.getElementById('liveToastBtn')
+    const toastLiveExample = document.getElementById('liveToast')
+    if (toastTrigger) {
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+        toastTrigger.addEventListener('click', () => {
+            toastBootstrap.show()})
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let passwordEntered = false;
+
+        document.getElementById('inputUserPw').addEventListener('input', function () {
+            passwordEntered = true;
+        });
+
+        document.getElementById('inputUserRePw').addEventListener('input', function () {
+            const password = document.getElementById('inputUserPw').value;
+            const passwordRepeat = document.getElementById('inputUserRePw').value;
+            const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+
+            if (passwordEntered && password !== passwordRepeat) {
+                passwordMatchMessage.style.display = 'block'; // Hiển thị thông báo khi mật khẩu không trùng khớp
+            } else {
+                passwordMatchMessage.style.display = 'none'; // Ẩn thông báo khi mật khẩu trùng khớp hoặc chưa nhập mật khẩu
+            }
+        });
+    });
+
+    function showPassword() {
+        var passwordInput = document.getElementById("inputUserPw");
+
+        if (passwordInput.type === "password") {
+            document.getElementById('pwEye').classList.replace('bi-eye-slash','bi-eye')
+            passwordInput.type = "text";
+        } else {
+            document.getElementById('pwEye').classList.replace('bi-eye','bi-eye-slash')
+            passwordInput.type = "password";
+        }
+    }
+
+    function showRePassword() {
+        var rePasswordInput = document.getElementById("inputUserRePw");
+
+        if (rePasswordInput.type === "password") {
+            document.getElementById('rePwEye').classList.replace('bi-eye-slash','bi-eye')
+            rePasswordInput.type = "text";
+        } else {
+            document.getElementById('rePwEye').classList.replace('bi-eye','bi-eye-slash')
+            rePasswordInput.type = "password";
+        }
+    }
+</script>
+<script th:inline="javascript" type="text/javascript">
+    $(document).ready(function (){
+        $('.showBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (user){
+                $('#getUserName').text(user.name);
+                $('#getUserPhone').text(user.phone);
+                $('#getUserAddress').text(user.address);
+                $('#getUserEmail').text(user.email);
+            });
+
+            $('#showUserModal').modal('show');
+
+
+        });
+
+        $('.nBtn, .eBtn').on('click', async function (event) {
+            event.preventDefault();
+            const href = $(this).attr('href');
+            const hasPencilIcon = $(this).find('.bi-pencil-square').length > 0;
+            if (hasPencilIcon) {
+                $.get(href, function (account) {
+                    $('.myForm #addEditLabel').text('Cập nhật người dùng');
+                    $('.myForm #inputUserID').val(account.id);
+                    $('.myForm #inputUserName').val(account.name);
+                    $('.myForm #inputUserEmail').val(account.email);
+                    $('.myForm #inputUserPw').val("");
+                    $('.myForm #inputUserRePw').val("");
+                    $('.myForm #inputUserAddress').val(account.address);
+                    $('.myForm #inputUserPhone').val(account.phone);
+                    $('.myForm #inputUserRole').val(account.role);
+                    $('.myForm #inputUserStatus').val(account.isEnable);
+
+                });
+                $('#inputUserPw').prop('required', false);
+                $('#inputUserRePw').prop('required', false);
+                $('label[for="inputUserPw"]').text('Mật khẩu');
+                $('label[for="inputUserRePw"]').text('Nhập lại mật khẩu');
+                $('.myForm #addEditUser').modal('show');
+            } else {
+                $('.myForm #addEditLabel').text('Thêm người dùng');
+                $('.myForm #inputUserName').val('');
+                $('.myForm #inputUserEmail').val('');
+                $('.myForm #inputUserPw').val('');
+                $('.myForm #inputUserRePw').val('');
+                $('.myForm #inputUserAddress').val('');
+                $('.myForm #inputUserPhone').val('');
+                $('.myForm #inputUserRole').val('');
+                $('.myForm #inputUserStatus').val(1);
+                $('.myForm #addEditUser').modal('show');
+            }
+        });
+
+
+        $('.deactivatedBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (account){
+                $('#deactivated').attr('href', '/admin/account/deactivate/' + account.id);
+                $('#discontinue #stopUserName').text('Bạn có chắc chắn muốn ngừng hoạt động người dùng ' + account.name + '? Thông tin và giao dịch của người dùng này vẫn sẽ được giữ.');
+            });
+            $('#discontinue').modal('show');
+        });
+
+        $('.delBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (account){
+                $('#deleted').attr('href', '/admin/account/delete/' + account.id);
+                $('#deleteUser #delUserName').text('Hệ thống sẽ xóa hoàn toàn người dùng ' + account.name + ' nhưng vẫn giữ những giao dịch lịch sử nếu có. Bạn có chắc chắn muốn xóa?');
+            });
+            $('#deleteUser').modal('show');
+        });
+
+
+        $("#roleFilter div input, #statusFilter div input").change(function() {
+            filterData();
+        });
+        $("#keyword").keyup(function (event){
+            if (event.key === "Enter") {
+                filterData();
+            }
+        })
+        function filterData() {
+            var roleFilter = $('input[name="roleFilter"]:checked').val();
+            var statusFilter = $('input[name="statusFilter"]:checked').val();
+            const keyword = $("#keyword").val();
+            var url = "/admin/account?pageNo=1" +
+                (keyword ? "&keyword=" + keyword : "") +
+                (roleFilter ? "&roleFilter=" + roleFilter : "") +
+                (statusFilter ? "&statusFilter=" + statusFilter : "");
+
+            window.location.replace(url);
+        }
+        $(window).on('load', function() {
+            // Lấy giá trị đã chọn của roleFilter và statusFilter từ URL query string
+            const params = new URLSearchParams(window.location.search);
+            const roleFilter = params.get('roleFilter');
+            const statusFilter = params.get('statusFilter');
+            const keyword = params.get('keyword');
+
+            // Gán lại giá trị cho các phần tử roleFilter và statusFilter
+            $('input[name="roleFilter"][value="' + roleFilter + '"]').prop('checked', true);
+            $('input[name="statusFilter"][value="' + statusFilter + '"]').prop('checked', true);
+            $("#keyword").val(keyword);
+        });
+
+        if ([[${messageSuccess}]]) {
+            bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+        }
+        if ([[${messageFail}]]) {
+            bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+        }
+
+    });
+
+
+</script>
+
+</html>

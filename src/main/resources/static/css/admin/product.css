@@ -1,0 +1,94 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13.8px;
+    line-height: 25px;
+}
+.nav-bg-color{
+    background-color: #a13a3a;
+}
+.offcanvas-header, .offcanvas-body{
+    background-color: #a13a3a;
+}
+.btn-nav-item{
+    --bs-btn-bg: #a13a3a;
+    --bs-btn-hover-bg: #740001;
+    --bs-btn-active-bg: #740001;
+    border: 0;
+}
+.btn-cart{
+    --bs-btn-bg: #eeba30;
+    --bs-btn-hover-bg: #740001;
+    --bs-btn-active-bg: #740001;
+    --bs-btn-hover-color:white;
+    border: 0;
+}
+.overF{
+    overflow-y: scroll;
+    height: 600px;
+    overscroll-behavior: contain;
+    -ms-overflow-style: none;
+}
+
+.overF::-webkit-scrollbar{
+    width: 0 !important;
+    display: none;
+}
+
+.tableScroll{
+    overflow-y: scroll;
+    height: 479px;
+    overscroll-behavior: contain;
+    -ms-overflow-style: none;
+}
+
+.tableScroll::-webkit-scrollbar{
+    display: none;width: 0 !important;
+}
+
+.active>.page-link{
+    background-color: rgba(161,58,58,0.5);
+    border-color: rgba(161,58,58,0.5);
+}
+.page-link{
+    color: rgba(161,58,58,0.5);
+}
+.page-link:hover{
+    color: rgba(161,58,58,0.5);
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border: 1px solid #dee2e6;
+    background-color: white !important;
+}
+
+.form-control:-webkit-autofill {
+    background-color: #fff !important; /* Đổi nền thành màu trắng */
+    background-image: none !important; /* Loại bỏ bất kỳ hình ảnh nền nào */
+}
+
+.btn-tab.active {
+    background-color: #C68888;
+    color: white;
+    border: 0;
+}
+.btn-tab {
+    background-color: white;
+    color: #C68888;
+    border: 1px solid #C68888;
+}
+.btn-tab:hover, .btn-tab:active {
+    color: #C68888;
+    border: 1px solid #C68888;
+}
+.btn-tab.active:hover {
+    background-color: #C68888;
+    color: white;
+    border: 0;
+}
+.form-check-input:checked {
+    background-color: rgba(161,58,58,0.5);
+    border-color: rgba(161,58,58,0.5);
+}

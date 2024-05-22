@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Trang chủ</title>
+    <div th:replace="admin/layout/head :: head"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<style>
+    .btn-chart.active {
+        background-color: #C68888;
+        color: white;
+        border: 0;
+    }
+    .btn-chart {
+        background-color: white;
+        color: #C68888;
+        border: 1px solid #C68888;
+    }
+    .btn-chart:hover, .btn-chart:active {
+        color: #C68888;
+        border: 1px solid #C68888;
+    }
+    .btn-chart.active:hover {
+        background-color: #C68888;
+        color: white;
+        border: 0;
+    }
+</style>
+<body>
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2" style="background-color: #f5ebeb;"></div>
+
+        <div class="col-md-8" style="background-color: #f5ebeb;">
+            <div class="p-2">
+                <div class="container-fluid p-0 my-3">
+                    <div class="row">
+                        <div class="col-sm-4 mb-3 mb-sm-0">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Kết quả bán hàng hôm nay</h5>
+                                    <p class="card-text" th:text="${#numbers.formatCurrency(amountAndCountInvoice[0][0]) + ' | ' + amountAndCountInvoice[0][1] + ' hoá đơn'}"></p>
+                                    <a th:href="@{/admin/invoice}" class="btn btn-primary border-0" style="background-color: #C68888;">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mb-3 mb-sm-0">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Hàng hoá</h5>
+                                    <p class="card-text">Tồn kho [[${totalQuantityP}]] sản phẩm | [[${countP}]] mặt hàng</p>
+                                    <a th:href="@{/admin/product}" class="btn btn-primary border-0" style="background-color: #C68888;">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Nhập hàng</h5>
+                                    <p class="card-text" th:text="${#numbers.formatCurrency(amountAndCountPO[0][0]) + ' | ' + amountAndCountPO[0][1] + ' phiếu nhập'}"></p>
+                                    <a th:href="@{/admin/PurchaseOrder}" class="btn btn-primary border-0" style="background-color: #C68888;">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card my-3">
+                    <div class="card-header">
+                        Doanh thu bán hàng hôm nay
+                    </div>
+                    <div class="card-body">
+                        <blockquote class="blockquote mb-0">
+                            <canvas id="myChart1" style="width:100%;"></canvas>
+                        </blockquote>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-pills" id="myTab" role="tablist">
+                            <li class="nav-item me-2" role="presentation">
+                                <button class="btn btn-chart active" id="pills-quantity-tab" data-bs-toggle="pill" data-bs-target="#pills-quantity" type="button" role="tab" aria-controls="pills-quantity" aria-selected="true">Theo số lượng</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="btn btn-chart" id="pills-amount-tab" data-bs-toggle="pill" data-bs-target="#pills-amount" type="button" role="tab" aria-controls="pills-amount" aria-selected="false">Theo doanh thu</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="pills-quantity" role="tabpanel" aria-labelledby="pills-quantity-tab" tabindex="0">
+                                <blockquote class="blockquote mb-0">
+                                    <canvas id="myChart2" style="width:100%;"></canvas>
+                                </blockquote>
+                            </div>
+                            <div class="tab-pane fade" id="pills-amount" role="tabpanel" aria-labelledby="pills-amount-tab" tabindex="0">
+                                <blockquote class="blockquote mb-0">
+                                    <canvas id="myChart3" style="width:100%;"></canvas>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <script th:inline="javascript">
+                    var xValues = [];
+                    var yValues = [];
+                    [[${getAmountToday}]].forEach(item => {
+                        xValues.push(item[1]);
+                        yValues.push(item[2]);
+                    });
+
+                    // Function to generate transparent colors with different opacities
+                    function generateTransparentColors(baseColor, numColors) {
+                        var transparentColors = [];
+                        for (var i = 1; i <= numColors; i++) {
+                            var opacity = i / (numColors + 1); // Calculate opacity based on number of colors
+                            var rgbaColor = baseColor + Math.round(opacity * 255).toString(16); // Convert opacity to HEX
+                            transparentColors.push(rgbaColor);
+                        }
+                        return transparentColors;
+                    }
+
+                    // Base color
+                    var baseColor = "#C68888";
+                    var numColors = xValues.length; // Number of items in xValues
+
+                    var transparentColors = generateTransparentColors(baseColor, numColors);
+
+                    new Chart("myChart1", {
+                        type: "pie",
+                        data: {
+                            labels: xValues,
+                            datasets: [{
+                                backgroundColor: transparentColors,
+                                data: yValues
+                            }]
+                        },
+                        options: {
+                            title: {
+                                display: true,
+                                text: "Doanh thu bán hàng hôm nay"
+                            }
+                        }
+                    });
+                </script>
+
+                <script th:inline="javascript">
+                    var productName1 = [];
+                    var totalQuantity = [];
+
+                    [[${quantityTop10}]].forEach(item => {
+                        productName1.push(item[1]);
+                        totalQuantity.push(item[2]);
+                    });
+                    new Chart("myChart2", {
+                        type: "horizontalBar",
+                        data: {
+                            labels: productName1,
+                            datasets: [{
+                                backgroundColor: "#C68888",
+                                data: totalQuantity
+                            }]
+                        },
+                        options: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: "Top 10 sản phẩm bán chạy theo số lượng"
+                            }
+                        }
+                    });
+                </script>
+
+                <script th:inline="javascript">
+                    const productName2 = [];
+                    const totalAmount = [];
+
+                    [[${amountTop10}]].forEach(item => {
+                        productName2.push(item[1]);
+                        totalAmount.push(item[2]);
+                    });
+                    new Chart("myChart3", {
+                        type: "horizontalBar",
+                        data: {
+                            labels: productName2,
+                            datasets: [{
+                                backgroundColor: "#C68888",
+                                data: totalAmount
+                            }]
+                        },
+                        options: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: "Top 10 sản phẩm bán chạy theo doanh thu"
+                            }
+                        }
+                    });
+                </script>
+            </div>
+
+        </div>
+
+        <div class="col-md-2" style="background-color: #f5ebeb;"></div>
+
+    </div>
+</div>
+
+</body>
+</html>

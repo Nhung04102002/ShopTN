@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nhà cung cấp</title>
+    <div th:replace="admin/layout/head :: head"></div>
+</head>
+<body>
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 shadow-sm" style="background-color: #f5ebeb;">
+            <h5 class="pt-2 pb-1 mt-4 mb-3"><i class="fa-solid fa-filter"></i> <b>Lọc theo</b></h5>
+            <div class="overF">
+                <div class="mb-3">
+                    <div class="p-2 text-white shadow-sm d-flex justify-content-between rounded-2"
+                         style="background-color: rgba(161,58,58,0.5);">
+                        <h6 class="m-1"><b>Nhóm nhà cung cấp</b></h6>
+                        <div class="d-flex">
+                            <a class="btn rounded-circle py-0 px-1 text-white nBtnC" type="button">
+                                <i class="bi bi-plus-circle"></i></a>
+                            <button class="btn rounded-circle py-0 px-1 text-white" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#category" aria-expanded="true"
+                                    aria-controls="category">
+                                <i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+
+                    </div>
+                    <div class="collapse show shadow-sm rounded-2 bg-white" id="category">
+                        <div id="groupFilter" class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="groupFilter" id="categoryAll" value="" checked>
+                                <label class="form-check-label" for="categoryAll">Tất cả</label>
+                            </div>
+                            <div class="form-check" th:each="cate : ${listGroup}">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <input class="form-check-input" type="radio" name="groupFilter" th:id="${'cate'+cate.supplierID}" th:value="${cate.supplierID}">
+                                        <label class="form-check-label" th:for="${'cate'+cate.supplierID}" th:text="${cate.supplierName}"></label>
+                                    </div>
+                                    <div class="col-2 text-end p-0">
+                                        <a th:href="@{/admin/supplier/findSupplierID(supplierID=${cate.supplierID})}" class="btn rounded-circle py-0 px-1 eBtnC text-success me-3" type="button"><i class="bi bi-pencil-square"></i></a>
+
+                                    </div>
+                                </div>
+
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+                         style="background-color: rgba(161,58,58,0.5);">
+                        <h6 class="m-1"><b>Trạng thái thanh toán</b></h6>
+                        <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#debt" aria-expanded="true" aria-controls="debt"><i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <div class="collapse show shadow-sm rounded-2 bg-white" id="debt">
+                        <div id="payStatusFilter" class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payStatusFilter" value="" checked>
+                                <label class="form-check-label">Tất cả</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payStatusFilter" id="inDebt" value="2">
+                                <label class="form-check-label" for="inDebt">Nợ nhà cung cấp</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payStatusFilter" id="finished" value="1">
+                                <label class="form-check-label" for="finished">Đã thanh toán hết</label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="p-2 shadow-sm d-flex justify-content-between rounded-2 text-white"
+                         style="background-color: rgba(161,58,58,0.5);">
+                        <h6 class="m-1"><b>Trạng thái</b></h6>
+                        <button class="btn text-white rounded-circle py-0 px-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#show" aria-expanded="true" aria-controls="show"><i
+                                class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <div class="collapse show shadow-sm rounded-2 bg-white" id="show">
+                        <div id="statusFilter" class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveTrue" value="1" checked>
+                                <label class="form-check-label" for="isActiveTrue">Đang hoạt động</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" id="isActiveFalse" value="2">
+                                <label class="form-check-label" for="isActiveFalse">Ngừng hoạt động</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statusFilter" value="1,2">
+                                <label class="form-check-label">Tất cả</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-10" style="background-color: #f5ebeb;">
+            <div class="p-2">
+                <div class="container-fluid p-0 my-3">
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="m-0">Nhà cung cấp</h3>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex justify-content-between">
+                                <form class="d-flex" role="search">
+                                    <div class="input-group"  style="min-width: 350px; max-width: 400px;">
+                                        <span class="input-group-text border-end-0 bg-white" id="basic-addon1"><i
+                                                class="fa-solid fa-magnifying-glass"></i></span>
+                                        <input class="form-control border-start-0 ps-0" type="search" id="keyword"
+                                               name="keyword" th:value="${keyword}"
+                                               placeholder="Mã, tên NCC, SĐT, email, địa chỉ">
+                                    </div>
+                                    <a th:href="@{/admin/supplier}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+                                </form>
+
+                                <button class="btn btn-success nBtn" type="button" style="min-width: 124px;">
+                                    <i class="bi bi-plus-circle-fill me-2"></i>Thêm mới</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table m-0 align-middle">
+                    <thead>
+                    <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+                        <th class="col-2 ps-4">Mã nhà cung cấp</th>
+                        <th class="col-3">Tên nhà cung cấp</th>
+                        <th class="col-2">Số điện thoại</th>
+                        <th class="col-2">Email</th>
+                        <th class="col-1 text-end">Tổng mua</th>
+                        <th class="col-2 text-center">Chức năng</th>
+                    </tr>
+                    </thead>
+                </table>
+                <div class="tableScroll" style="overflow-y: scroll; height: 479px;overscroll-behavior: contain;">
+                    <table class="table table-hover table-striped align-middle" style="--bs-table-hover-bg: rgba(238,186,48,0.5);"
+                           role="grid">
+                        <colgroup>
+                            <col class="col-2">
+                            <col class="col-3">
+                            <col class="col-2">
+                            <col class="col-2">
+                            <col class="col-1 text-end">
+                            <col class="col-2 text-center">
+                        </colgroup>
+                        <thead>
+                        <tr style="--bs-table-bg: rgba(238,186,48,0.2);">
+                            <th colspan="4" class="ps-4" th:text="${totalItems} + ' nhà cung cấp'"></th>
+                            <th class="text-end" colspan="1" th:text="${#numbers.formatCurrency(totalAmount)}"></th>
+                            <th colspan="1"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="supplier : ${supplierList}" th:if="${supplier[5] == 1 || supplier[5] == 2}">
+                            <td class="ps-4" th:text="${supplier[0]}"></td>
+                            <td th:text="${supplier[1]}"></td>
+                            <td th:text="${supplier[2]}"></td>
+                            <td th:text="${supplier[3]}"></td>
+                            <td class="text-end" th:text="${#numbers.formatCurrency(supplier[4])}"></td>
+                            <td class="text-center">
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Xem">
+                                    <a class="btn text-primary px-1 sBtn" th:href="@{/admin/supplier/findSupplierID(supplierID=${supplier[0]})}"><i
+                                            class="bi bi-info-circle-fill"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Sửa">
+                                            <a class="btn text-success px-1 eBtn" th:href="@{/admin/supplier/findSupplierID(supplierID=${supplier[0]})}">
+                                                <i class="bi bi-pencil-square"></i></a>
+                                        </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Ngừng hoạt động" th:if="${supplier[5] == 1}">
+                                            <a th:href="@{/admin/supplier/findSupplierID(supplierID=${supplier[0]})}" class="btn text-secondary px-1 deactivatedBtn">
+                                                <i class="fa-solid fa-toggle-on"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Đang hoạt động" th:if="${supplier[5] == 2}">
+                                            <a th:href="@{'/admin/supplier/activate/' + ${supplier[0]}}" class="btn text-secondary px-1">
+                                                <i class="fa-solid fa-toggle-off"></i></a>
+                                </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                      data-bs-title="Xoá">
+                                            <a th:href="@{/admin/supplier/findSupplierID(supplierID=${supplier[0]})}" class="btn text-danger px-1 delBtn"><i class="bi bi-trash3"></i></a>
+                                </span>
+
+                            </td>
+                        </tr>
+                        <tr th:if="${totalItems==0}">
+                            <th class="text-center" colspan="6">Không tìm thấy kết quả nào phù hợp</th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex mt-3">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination" th:if="${totalItems > 0}">
+                            <li class="page-item" th:if="${currentPage > 1}"><a class="page-link" th:href="@{'?pageNo='+${currentPage - 1}}"><i class="fa-solid fa-angle-left"></i></a></li>
+                            <li class="page-item" th:each="i:${#numbers.sequence(1, totalPage)}" th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link"
+                                   th:href="@{'?'+ ${keyword != null && keyword != ''? 'keyword='+keyword+'&':''}+
+                                           ${groupFilter != null && groupFilter != ''? 'groupFilter='+groupFilter+'&':''}+
+                                           ${payStatusFilter != '1' && payStatusFilter != null? 'payStatusFilter='+payStatusFilter+'&':''}+
+                                           ${statusFilter != '1' && statusFilter != null? 'statusFilter='+statusFilter+'&':''}+'pageNo='+${i}}">[[${i}]]</a>
+                            </li>
+                            <li class="page-item" th:if="${currentPage < totalPage}"><a class="page-link" th:href="@{'?pageNo='+${currentPage + 1}}"><i class="fa-solid fa-angle-right"></i></a></li>
+                        </ul>
+                    </nav>
+                    <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) < totalItems}" th:text="'Hiển thị '+((${currentPage}-1)*10+1)+' - '+(${currentPage} * 10)+' / Tổng số '+${totalItems}+' hàng'"></p>
+                    <p class="m-2" th:if="${totalItems >= 10 && (currentPage * 10) >= totalItems}" th:text="'Hiển thị ' + ${totalItems} + ' / Tổng số ' + ${totalItems} + ' hàng'"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Xem thông tin nhà cung cấp -->
+<div class="modal fade" id="showSupplierModal" tabindex="-1" aria-labelledby="showSupplierLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.2);">
+                <div class="modal-title" id="showSupplierLabel">
+                    <ul class="nav nav-pills" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="btn btn-tab active" id="info-tab" data-bs-toggle="pill" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">Thông tin</button>
+                        </li>
+                        <li class="nav-item mx-2" role="presentation">
+                            <button class="btn btn-tab" id="history-tab" data-bs-toggle="pill" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">Lịch sử giao dịch</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="btn btn-tab" id="debt-tab" data-bs-toggle="tab" data-bs-target="#debt-tab-pane" type="button" role="tab" aria-controls="debt-tab-pane" aria-selected="false">Nợ cần trả NCC</button>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-5">
+                <div class="tab-content" style="min-height: 350px;" id="myTabContent">
+                    <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Mã nhà cung cấp:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierID" name="supplierID"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Tên nhà cung cấp:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierName" name="supplierName"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Nhóm nhà cung cấp:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierGroup" name="parentID.supplierName"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Số điện thoại:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierPhone" name="phone"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Email:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierEmail" name="email"></p>
+                            </div>
+                        </div>
+                        <div class="mb-3 row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Địa chỉ:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <p class="m-0" id="getSupplierAddress" name="address"></p>
+                            </div>
+                        </div>
+                        <div class="row border-bottom">
+                            <div class="col-sm-3 ps-0">
+                                <p class="m-0">Ghi chú:</p>
+                            </div>
+                            <div class="col-sm-9 ps-0">
+                                <textarea type="text" class="m-0 w-100 border-0" rows="3" id="getSupplierDescription" name="description" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
+                        <table class="table m-0 align-middle">
+                            <thead>
+                            <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+                                <th class="col-2 ps-4">Mã phiếu</th>
+                                <th class="col-3">Thời gian</th>
+                                <th class="col-2">Trạng thái</th>
+                                <th class="col-3">Trạng thái thanh toán</th>
+                                <th class="col-2 text-end">Tổng tiền</th>
+                            </tr>
+                            </thead>
+                        </table>
+                        <div class="tableScroll" style="overflow-y: scroll; height: 300px;overscroll-behavior: contain;">
+                            <table class="table table-striped align-middle" role="grid">
+                                <colgroup>
+                                    <col class="col-2">
+                                    <col class="col-3">
+                                    <col class="col-2">
+                                    <col class="col-3">
+                                    <col class="col-2 text-end">
+                                </colgroup>
+                                <tbody id="historySup">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="debt-tab-pane" role="tabpanel" aria-labelledby="debt-tab" tabindex="0">
+                        <table class="table m-0 align-middle">
+                            <thead>
+                            <tr class="shadow-sm" style="--bs-table-bg: rgba(161,58,58,0.5);">
+                                <th class="col-3 ps-4">Mã phiếu nhập</th>
+                                <th class="col-3">Thời gian</th>
+                                <th class="col-2 text-end">Tổng tiền</th>
+                                <th class="col-2 text-end">Đã trả</th>
+                                <th class="col-2 text-end">Còn nợ NCC</th>
+
+                            </tr>
+                            </thead>
+                        </table>
+                        <div class="tableScroll" style="overflow-y: scroll; height: 300px;overscroll-behavior: contain;">
+                            <table class="table table-striped align-middle" role="grid">
+                                <colgroup>
+                                    <col class="col-3">
+                                    <col class="col-3">
+                                    <col class="col-2 text-end">
+                                    <col class="col-2 text-end">
+                                    <col class="col-2 text-end">
+                                </colgroup>
+                                <tbody id="debtSup">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Sửa danh mục-->
+<div class="myForm">
+    <form th:action="@{/admin/supplier/save/group}" method="post">
+        <div class="modal fade" id="editGroup" tabindex="-1" aria-labelledby="editGroupLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                        <p class="modal-title fs-6 fw-normal text-white" id="editGroupLabel"></p>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <input type="text" class="form-control" id="groupID" name="supplierID" value="" style="display: none;">
+                            <label for="groupName" class="col-sm-5 col-form-label">Tên nhóm nhà cung cấp <span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" id="groupName" name="supplierName" value="" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <a href="" class="btn btn-danger delBtnC btn-sm" style="display: none;"><i class="bi bi-check-circle me-2"></i>Xoá</a>
+                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                                class="bi bi-x-circle me-2"></i>Đóng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!--Xoá danh mục-->
+<div class="modal fade" id="deleteGroup" tabindex="-1" aria-labelledby="deleteGroupLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <p class="modal-title fs-6 fw-normal text-white" id="deleteGroupLabel">Xác nhận xoá nhóm nhà cung cấp</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="m-0">Bạn có chắc chắn muốn xoá nhóm nhà cung cấp này không?</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+                <a href="" class="btn btn-danger btn-sm" id="delRef"><i class="bi bi-check-circle me-2"></i>Xoá</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Thêm/Sửa nhà cung cấp -->
+<div class="modal fade" id="addEditSupplier" tabindex="-1" aria-labelledby="addEditSupplierLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <form th:action="@{/admin/supplier/save}" method="post">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                    <p class="modal-title fs-6 fw-normal text-white" id="addEditSupplierLabel"></p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="inputSupplierID"  name="supplierID" style="display: none;">
+
+                    <div class="mb-3 row">
+                        <label for="inputSupplierName" class="col-sm-3 col-form-label">Tên nhà cung cấp <span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputSupplierName" name="supplierName">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputSupplierGroup" class="col-sm-3 col-form-label">Nhóm nhà cung cấp</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="inputSupplierGroup" name="parentID">
+                                <option value="" selected>Chọn nhóm nhà cung cấp</option>
+                                <option th:each="group : ${listGroup}"
+                                        th:value="${group.supplierID}" th:text="${group.supplierName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputSupplierPhone" class="col-sm-3 col-form-label">Số điện thoại <span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="tel" class="form-control" id="inputSupplierPhone"  name="phone" pattern="[0]{1}[0-9]{9}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputSupplierAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputSupplierAddress" name="address">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputSupplierEmail" class="col-sm-3 col-form-label">Email</label>
+                        <div class="col-sm-9">
+                            <input type="email" class="form-control" id="inputSupplierEmail"  name="email">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputSupplierDescription" class="col-sm-3 col-form-label">Ghi chú</label>
+                        <div class="col-sm-9">
+                            <textarea type="text" class="form-control" id="inputSupplierDescription"
+                                      rows="3" name="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="inputSupplierStatus" class="col-sm-3 col-form-label">Trạng thái</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="inputSupplierStatus" name="isEnable">
+                                <option value=1 selected>Đang hoạt động</option>
+                                <option value=2>Không hoạt động</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                            class="bi bi-x-circle me-2"></i>Đóng
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Ngừng hoạt động -->
+<div class="modal fade" id="discontinue" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="discontinueLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <p class="modal-title fs-6 fw-normal text-white" id="discontinueLabel">Xác nhận ngừng hoạt động</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="m-0" id="stopSupplier"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <a href="" class="btn btn-danger btn-sm" id="deactivated"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Xoá -->
+<div class="modal fade" id="deleteSupplier" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteSupplierLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <p class="modal-title fs-6 fw-normal text-white" id="deleteSupplierLabel">Xác nhận xoá nhà cung cấp</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="m-0" id="delSupplier"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    /* Tooltip */
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    /* Toast */
+    const toastTrigger = document.getElementById('liveToastBtn')
+    const toastLiveExample = document.getElementById('liveToast')
+    if (toastTrigger) {
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+        toastTrigger.addEventListener('click', () => {
+            toastBootstrap.show()})
+    }
+
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    $(document).ready(function (){
+
+        $('.nBtnC,.eBtnC').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            const hasPencilIcon = $(this).find('.bi-pencil-square').length > 0;
+            if (hasPencilIcon) {
+                $.get(href, function (group){
+                    $('#editGroupLabel').text('Sửa nhóm nhà cung cấp ' + group.supplierID);
+                    $('.myForm #groupID').val(group.supplierID);
+                    $('.myForm #groupName').val(group.supplierName);
+                    $('.delBtnC').css('display', 'block');
+                    $('.delBtnC').attr('href', '/admin/supplier/delete/' + group.supplierID);
+                });
+                $('.myForm #editGroup').modal('show');
+            } else {
+                $('#editGroupLabel').text('Thêm nhóm nhà cung cấp');
+                $('.myForm #groupID').val('');
+                $('.myForm #groupName').val('');
+                $('.delBtnC').css('display', 'none');
+                $('.myForm #editGroup').modal('show');
+            }
+        });
+
+        $('.delBtnC').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+
+            $('#deleteGroup #delRef').attr('href',href);
+            $('#deleteGroup').modal('show');
+        });
+
+        $('.sBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (supplier){
+                $('#getSupplierID').text(supplier.supplierID);
+                $('#getSupplierName').text(supplier.supplierName);
+                $('#getSupplierPhone').text(supplier.phone);
+                $('#getSupplierAddress').text(supplier.address);
+                $('#getSupplierEmail').text(supplier.email);
+                $('#getSupplierDescription').val(supplier.description);
+                $('#getSupplierGroup').text(supplier.parentID.supplierID != null ? supplier.parentID.supplierName : '');
+
+                $('#historySup').empty();
+                const historyTrans = [[${historyTrans}]];
+                historyTrans.forEach(po => {
+                    if(po[5] === supplier.supplierID && po[0] !== null) {
+                        const date = new Date(po[1]);
+                        const formattedDate = date.toLocaleDateString('vi-VN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        const formattedTime = date.toLocaleTimeString('vi-VN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false // Sử dụng định dạng 24 giờ
+                        });
+                        const formattedCurrency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(po[4]);
+                        let statusPay = '';
+                        if (po[3] === 1) {
+                            statusPay = 'Đã thanh toán';
+                        } else if (po[3] === 0) {
+                            statusPay = 'Chưa thanh toán';
+                        } else {
+                            statusPay = 'Thanh toán một phần';
+                        }
+                        let status = '';
+                        if (po[2] === 1) {
+                            status = 'Đã nhập';
+                        } else if (po[2] === 0) {
+                            status = 'Đã huỷ';
+                        } else {
+                            status = 'Phiếu tạm';
+                        }
+                        $('#historySup').append(`
+                        <tr>
+                          <td class="ps-4">${po[6]}</td>
+                          <td>${formattedDate} ${formattedTime}</td>
+                          <td>${status}</td>
+                          <td>${statusPay}</td>
+                          <td class="text-end">${formattedCurrency}</td>
+                        </tr>`);
+                    }
+                })
+                if ($('#historySup tr').length === 0) {
+                    $('#historySup').append(`
+                        <tr>
+                          <th class="text-center" colSpan="5">Không có lịch sử giao dịch nào với nhà cung cấp này</th>
+                        </tr>`);
+                }
+
+                $('#debtSup').empty();
+                const debtSup = [[${debtSupplier}]];
+                debtSup.forEach(debt => {
+                    if(debt[4] === supplier.supplierID && debt[0] !== null) {
+                        const date = new Date(debt[1]);
+                        const formattedDate = date.toLocaleDateString('vi-VN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        const formattedTime = date.toLocaleTimeString('vi-VN', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false // Sử dụng định dạng 24 giờ
+                        });
+                        const total = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(debt[2]);
+                        const paid = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(debt[3]);
+                        const debtS = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(debt[2] - debt[3]);
+                        $('#debtSup').append(`
+                        <tr>
+                          <td class="ps-4">${debt[5]}</td>
+                          <td>${formattedDate} ${formattedTime}</td>
+                          <td class="text-end">${total}</td>
+                          <td class="text-end">${paid}</td>
+                          <td class="text-end">${debtS}</td>
+                        </tr>`);
+                    }
+                })
+                if ($('#debtSup tr').length === 0) {
+                    $('#debtSup').append(`
+                        <tr>
+                          <th class="text-center" colSpan="5">Không có khoản nợ cần thanh toán với nhà cung cấp này</th>
+                        </tr>`);
+                }
+
+            });
+                $('#showSupplierModal').modal('show');
+        });
+
+        $('.nBtn, .eBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            const hasPencilIcon = $(this).find('.bi-pencil-square').length > 0;
+            if (hasPencilIcon) {
+                $.get(href, function (supplier){
+                    $('#addEditSupplierLabel').text('Cập nhật thông tin nhà cung cấp');
+                    $('#inputSupplierID').val(supplier.supplierID);
+                    $('#inputSupplierName').val(supplier.supplierName);
+                    $('#inputSupplierPhone').val(supplier.phone);
+                    $('#inputSupplierAddress').val(supplier.address);
+                    $('#inputSupplierEmail').val(supplier.email);
+                    $('#inputSupplierDescription').val(supplier.description);
+                    $('#inputSupplierStatus').val(supplier.isEnable);
+                    $('#inputSupplierGroup').val(supplier.parentID.supplierID);
+                });
+                $('#addEditSupplier').modal('show');
+            }
+            else{
+                $('#addEditSupplierLabel').text('Thêm nhà cung cấp');
+                $('#inputSupplierID').val('');
+                $('#inputSupplierName').val('');
+                $('#inputSupplierPhone').val('');
+                $('#inputSupplierAddress').val('');
+                $('#inputSupplierEmail').val('');
+                $('#inputSupplierDescription').val('');
+                $('#inputSupplierStatus').val(1);
+                $('#inputSupplierGroup').val('');
+                $('#addEditSupplier').modal('show');
+            }
+        });
+
+        $('.deactivatedBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (supplier){
+                $('#deactivated').attr('href', '/admin/supplier/deactivate/' + supplier.supplierID);
+                $('#discontinue #stopSupplier').text('Bạn có chắc chắn muốn ngừng hoạt động nhà cung cấp ' + supplier.supplierName + '? Thông tin và giao dịch với nhà cung cấp này vẫn sẽ được giữ.');
+            });
+            $('#discontinue').modal('show');
+        });
+
+        $('.delBtn').on('click', function (event){
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (supplier){
+                $('#deleted').attr('href', '/admin/supplier/delete/' + supplier.supplierID);
+                $('#deleteSupplier #delSupplier').text('Hệ thống sẽ xóa hoàn toàn nhà cung cấp ' + supplier.supplierName + ' nhưng vẫn giữ những giao dịch lịch sử nếu có. Bạn có chắc chắn muốn xóa?');
+            });
+            $('#deleteSupplier').modal('show');
+        });
+
+        $("#groupFilter div input, #payStatusFilter div input, #statusFilter div input").change(function (){
+            filterData();
+        });
+        $("#keyword").keyup(function (event){
+            if (event.key === "Enter") {
+                filterData();
+            }
+        })
+        function filterData(){
+            const groupFilter = $('input[name="groupFilter"]:checked').val();
+            const statusFilter = $('input[name="statusFilter"]:checked').val();
+            const payStatusFilter = $('input[name="payStatusFilter"]:checked').val();
+            const keyword = $("#keyword").val();
+
+            const url = "/admin/supplier?pageNo=1" +
+                (keyword ? "&keyword=" + keyword : "") +
+                (groupFilter ? "&groupFilter=" + groupFilter : "") +
+                (payStatusFilter ? "&payStatusFilter=" + payStatusFilter : "") +
+                (statusFilter ? "&statusFilter=" + statusFilter : "");
+            window.location.replace(url);
+        }
+        $(window).on('load', function() {
+            const params = new URLSearchParams(window.location.search);
+            const groupFilter = params.get('groupFilter');
+            const statusFilter = params.get('statusFilter');
+            const payStatusFilter = params.get('payStatusFilter');
+            const keyword = params.get('keyword');
+
+            $('input[name="groupFilter"][value="' + groupFilter + '"]').prop('checked', true);
+            $('input[name="payStatusFilter"][value="' + payStatusFilter + '"]').prop('checked', true);
+            $('input[name="statusFilter"][value="' + statusFilter + '"]').prop('checked', true);
+            $("#keyword").val(keyword);
+        });
+
+        if ([[${messageSuccess}]]) {
+            bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+        }
+        if ([[${messageFail}]]) {
+            bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+        }
+
+    });
+
+
+</script>
+</html>

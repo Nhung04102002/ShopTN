@@ -1,0 +1,139 @@
+.search input{
+    width: 100%;
+}
+
+.pay{
+    position: fixed;
+    bottom: 0;
+    width: inherit;
+    padding-right: 16px;
+}
+
+.footer {
+    background-color: white;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    margin-left: -12px;
+    border: 1px solid rgba(161,58,58,0.5);
+    width: 100%;
+}
+
+.product-list {
+    padding: 0px 10px;
+    overflow-y: auto;
+    height: 600px;
+    overflow-x: hidden;
+    border-radius: 5px;
+    margin-bottom: 11px;
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 10px !important;
+    row-gap: 10px !important;
+    grid-template-rows: max-content;
+    grid-auto-rows: min-content;
+}
+
+.product-list::-webkit-scrollbar{
+    width: 6px;
+}
+
+.product-list::-webkit-scrollbar-track{
+    background: #f1f1f1;
+    border-radius: 25px;
+}
+
+.product-list::-webkit-scrollbar-thumb{
+    background: #ccc;
+    border-radius: 25px;
+}
+
+.product {
+    cursor: pointer;
+    border: 1px solid rgba(161,58,58,0.5);
+    background: white;
+    height: fit-content;
+    width: 100%;
+}
+
+.product img {
+    background: #C68888;
+    height: 100px;
+    object-fit: cover;
+}
+
+.product .p-details h2 {
+    font-size: 14px;
+}
+
+.card-body {
+    padding: 10px;
+}
+
+.truncate-text {
+    white-space: nowrap; /* Ngăn chặn các dòng xuống dòng */
+    overflow: hidden; /* Ẩn phần nội dung vượt quá khung */
+    text-overflow: ellipsis; /* Hiển thị dấu ba chấm (...) */
+}
+
+.btn-bd-cart {
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: rgba(161,58,58,0.5);
+    --bs-btn-bg: white;
+    --bs-btn-border-color: rgba(161,58,58,0.5);
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg: rgba(161,58,58,0.5);
+    --bs-btn-hover-border-color: rgba(161,58,58,0.5);
+    --bs-btn-focus-shadow-rgb: rgba(161,58,58,0.5);
+    --bs-btn-active-color: var(--bs-btn-color);
+    --bs-btn-active-bg: #{shade-color(rgba(161,58,58,0.5), 20%)};
+    --bs-btn-active-border-color: #{shade-color(rgba(161,58,58,0.5), 20%)};
+    border-radius: 0.3rem 0rem 0.3rem 0rem;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.num-container input {
+    opacity: inherit;
+}
+
+.num-container input:focus, .discountAll input:focus, .cusPay input:focus, .amountPaid:focus {
+    outline: none;
+}
+
+.quantity-input::-webkit-inner-spin-button {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.quantity-input::-webkit-outer-spin-button {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.cart-count {
+    background-color:rgba(161,58,58,0.5) !important;
+    border: 1px solid rgba(161,58,58,0.5) !important;
+    color: #000 !important;
+}
+
+.discount-input::-webkit-inner-spin-button, .discount-input::-webkit-outer-spin-button,
+.cogs-input::-webkit-inner-spin-button, .cogs-input::-webkit-outer-spin-button,
+.discountAll input::-webkit-inner-spin-button, .discountAll input::-webkit-outer-spin-button,
+.cusPay input::-webkit-inner-spin-button, .cusPay input::-webkit-outer-spin-button,
+.amountPaid::-webkit-inner-spin-button, .amountPaid::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Đảm bảo không có khoảng trống xung quanh */
+    display: none; /* Ẩn nút tăng và giảm */
+}
+
+.discountAll input, .cusPay input{
+    border: none;
+    width: 95%;
+}
