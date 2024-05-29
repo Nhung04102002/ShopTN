@@ -263,24 +263,31 @@
                         <div class="mb-3 row">
                             <label for="inputUserName" class="col-sm-3 col-form-label">Tên người dùng <span class="text-danger">*</span></label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inputUserName" name="name" value="" required>
+                                <input type="text" class="form-control" id="inputUserName"
+                                       name="name" value="" required autocomplete="off" onchange="account()">
+                                <small id="inputNameMessage1" class="form-text text-danger" >
+                                    Tên người dùng không được bỏ trống.</small>
                             </div>
                         </div>
                         <div class="mb-3 row">
                             <label for="inputUserEmail" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
                             <div class="col-sm-9">
-                                <input type="email" class="form-control" id="inputUserEmail" name="email" value="" required>
+                                <input type="text" class="form-control" id="inputUserEmail" name="email"
+                                       value="" required autocomplete="off" onchange="account()">
+                                <small id="inputEmailMessage" class="form-text text-danger" style="display:none;">
+                                    Email không hợp lệ. Vui lòng kiểm tra và nhập lại!</small>
                             </div>
                         </div>
                         <div class="mb-3 row">
                             <label for="inputUserPw" class="col-sm-3 col-form-label">Mật khẩu <span class="text-danger">*</span></label>
                             <div class="col-sm-9">
                                 <div class="input-group">
-                                    <input type="password" class="form-control border-end-0" id="inputUserPw" name="password" value="" required>
+                                    <input type="password" class="form-control border-end-0" id="inputUserPw" name="password" value="" required onchange="account()">
                                     <span class="input-group-text border-start-0 bg-white">
                                         <button type="button" class="border-0 bg-white" onclick="showPassword()"><i id="pwEye" class="bi bi-eye-slash"></i></button>
                                     </span>
                                 </div>
+                                <small id="passwordCondition" class="form-text text-danger">Mật khẩu có độ dài từ 6 - 15 kí tự (bao gồm chữ thường, chữ in hoa và chữ số)</small>
                             </div>
                         </div>
                         <div class="mb-3 row">
@@ -288,7 +295,7 @@
                                     class="text-danger">*</span></label>
                             <div class="col-sm-9">
                                 <div class="input-group">
-                                    <input type="password" class="form-control border-end-0" name="RePassword" id="inputUserRePw" value="" required>
+                                    <input type="password" class="form-control border-end-0" name="RePassword" id="inputUserRePw" value="" required onchange="account()">
                                     <span class="input-group-text border-start-0 bg-white">
                                         <button type="button" class="border-0 bg-white" onclick="showRePassword()"><i id="rePwEye" class="bi bi-eye-slash"></i></button>
                                     </span>
@@ -300,14 +307,18 @@
                             <label for="inputUserPhone" class="col-sm-3 col-form-label">Số điện thoại <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-9">
-                                <input type="tel" class="form-control" id="inputUserPhone" pattern="[0]{1}[0-9]{9}"
-                                       name="phone" required>
+                                <input type="text" class="form-control" id="inputUserPhone" onchange="account()"
+                                       name="phone" required autocomplete="off">
+                                <small id="inputPhoneMessage1" class="form-text text-danger">
+                                    Nhập ít nhất một số điện thoại.</small>
+                                <small id="inputPhoneMessage" class="form-text text-danger" style="display:none;">
+                                    Mỗi số điện thoại hợp lệ sẽ có độ dài từ 10 đến 11 số và chỉ dùng dấu phẩy để phân cách.</small>
                             </div>
                         </div>
                         <div class="mb-3 row">
                             <label for="inputUserAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="inputUserAddress" name="address">
+                                <input type="text" class="form-control" id="inputUserAddress" name="address" onchange="account()" autocomplete="off">
                             </div>
                         </div>
                         <div class="mb-3 row">
@@ -332,10 +343,9 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
-                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="saveUser" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
-                                class="bi bi-x-circle me-2"></i>Đóng
-                        </button>
+                                class="bi bi-x-circle me-2"></i>Đóng</button>
                     </div>
                 </div>
             </div>
@@ -412,26 +422,6 @@
             toastBootstrap.show()})
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        let passwordEntered = false;
-
-        document.getElementById('inputUserPw').addEventListener('input', function () {
-            passwordEntered = true;
-        });
-
-        document.getElementById('inputUserRePw').addEventListener('input', function () {
-            const password = document.getElementById('inputUserPw').value;
-            const passwordRepeat = document.getElementById('inputUserRePw').value;
-            const passwordMatchMessage = document.getElementById('passwordMatchMessage');
-
-            if (passwordEntered && password !== passwordRepeat) {
-                passwordMatchMessage.style.display = 'block'; // Hiển thị thông báo khi mật khẩu không trùng khớp
-            } else {
-                passwordMatchMessage.style.display = 'none'; // Ẩn thông báo khi mật khẩu trùng khớp hoặc chưa nhập mật khẩu
-            }
-        });
-    });
-
     function showPassword() {
         var passwordInput = document.getElementById("inputUserPw");
 
@@ -495,6 +485,8 @@
                 $('#inputUserRePw').prop('required', false);
                 $('label[for="inputUserPw"]').text('Mật khẩu');
                 $('label[for="inputUserRePw"]').text('Nhập lại mật khẩu');
+                $('#inputNameMessage1').css('display','none');
+                $('#inputPhoneMessage1').css('display','none');
                 $('.myForm #addEditUser').modal('show');
             } else {
                 $('.myForm #addEditLabel').text('Thêm người dùng');
@@ -506,6 +498,8 @@
                 $('.myForm #inputUserPhone').val('');
                 $('.myForm #inputUserRole').val('');
                 $('.myForm #inputUserStatus').val(1);
+                $('#inputNameMessage1').css('display','block');
+                $('#inputPhoneMessage1').css('display','block');
                 $('.myForm #addEditUser').modal('show');
             }
         });
@@ -575,5 +569,5 @@
 
 
 </script>
-
+<script th:src="@{/js/user.js}"></script>
 </html>

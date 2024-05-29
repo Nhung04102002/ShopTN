@@ -97,6 +97,11 @@
     opacity: inherit;
 }
 
+
+#cartItemList::-webkit-scrollbar{
+    width: 0px;
+}
+
 .num-container input:focus, .discountAll input:focus, .cusPay input:focus, .amountPaid:focus {
     outline: none;
 }

@@ -200,6 +200,9 @@
                     <a class="btn text-primary px-1 sBtn" th:href="@{/admin/invoice/findInvoice(invoiceID=${invoice[6]})}"><i
                             class="bi bi-info-circle-fill"></i></a>
                 </span>
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Sửa" th:if="${invoice[5] != 0}">
+                                      <a th:href="@{'/admin/invoice/edit/'+${invoice[6]}}" target="_blank" class="btn text-success px-1"><i class="bi bi-pencil-square"></i></a>
+                                </span>
                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Huỷ" th:if="${invoice[5] != 0}">
                       <a th:href="@{/admin/invoice/findInvoice(invoiceID=${invoice[6]})}" class="btn text-danger px-1 delBtn"><i class="fa-solid fa-ban"></i></a>
                 </span>
@@ -334,16 +337,16 @@
 <div class="modal fade" id="deleteProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteProductLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="deleteProductLabel">Xác nhận huỷ hoá đơn</h1>
+      <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+        <h1 class="modal-title fs-6 fw-normal text-white" id="deleteProductLabel">Xác nhận huỷ hoá đơn</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p id="delProduct"></p>
+        <p class="m-0" id="delProduct"></p>
       </div>
-      <div class="modal-footer">
-        <a href="" id="deleted" class="btn btn-danger"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+      <div class="modal-footer border-0 pt-0">
+        <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
       </div>
     </div>
   </div>
@@ -523,6 +526,13 @@
       $("#keyword").val(keyword);
       $("#creatorFilter").val(creatorFilter);
     });
+
+    if ([[${messageSuccess}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+    }
+    if ([[${messageFail}]]) {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+    }
   });
 </script>
 </body>

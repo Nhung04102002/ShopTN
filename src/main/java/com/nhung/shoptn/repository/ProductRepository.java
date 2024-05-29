@@ -107,4 +107,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("select distinct pod.product.productID, po.supplier.supplierID, po.supplier.supplierName from PODetails pod left join PurchaseReceipt po on pod.purchaseReceipt.id = po.id ")
     List<Object[]> getSupplierOfProduct();
+
 }

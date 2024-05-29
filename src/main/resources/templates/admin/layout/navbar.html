@@ -70,8 +70,8 @@
           <li>
             <hr class="dropdown-divider">
           </li>
-          <li><a class="dropdown-item" href="/signout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng
-            xuất</a></li>
+          <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#sign-outModal"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng
+            xuất</button></li>
         </ul>
       </div>
     </div>
@@ -143,8 +143,8 @@
     <div class="modal-dialog">
       <form th:action="@{'/admin/account/changePw/'+${loggedInUser.id}}" method="post">
       <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="changePasswordLabel">Đổi mật khẩu</h1>
+        <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+          <h1 class="modal-title fs-6 fw-normal text-white" id="changePasswordLabel">Đổi mật khẩu</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -152,19 +152,20 @@
             <label for="inputUserPw1" class="col-sm-4 col-form-label">Mật khẩu <span class="text-danger">*</span></label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="password" class="form-control border-end-0" id="inputUserPw1" name="changePw" value="" required>
+                <input type="password" class="form-control border-end-0" id="inputUserPw1" name="changePw" value="" required onchange="enterNewPw()">
                 <span class="input-group-text border-start-0 bg-white">
                   <button type="button" class="border-0 bg-white" onclick="showPassword1()"><i id="pwEye1" class="bi bi-eye-slash"></i></button>
               </span>
               </div>
+              <small id="passwordCondition1" class="form-text text-danger">Mật khẩu có độ dài từ 6 - 15 kí tự (bao gồm chữ thường, chữ in hoa và chữ số)</small>
             </div>
           </div>
-          <div class="mb-3 row">
+          <div class="row">
             <label for="inputUserRePw1" class="col-sm-4 col-form-label">Nhập lại mật khẩu <span
                     class="text-danger">*</span></label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="password" class="form-control border-end-0" name="RePassword1" id="inputUserRePw1" value="" required>
+                <input type="password" class="form-control border-end-0" name="RePassword1" id="inputUserRePw1" value="" required onchange="enterNewPw()">
                 <span class="input-group-text border-start-0 bg-white">
                                         <button type="button" class="border-0 bg-white" onclick="showRePassword1()"><i id="rePwEye1" class="bi bi-eye-slash"></i></button>
                                     </span>
@@ -173,9 +174,9 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i
+        <div class="modal-footer border-0 pt-0">
+          <button type="submit" class="btn btn-success btn-sm" id="saveNewPw1" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
                   class="bi bi-x-circle me-2"></i>Đóng
           </button>
         </div>
@@ -183,7 +184,24 @@
       </form>
     </div>
   </div>
-<script>
+  <div class="modal fade" id="sign-outModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sign-outLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+          <p class="modal-title fs-6 fw-normal text-white" id="sign-outLabel">Xác nhận đăng xuất</p>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="m-0">Bạn chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <a href="/signout" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
   $(document).ready(function () {
     $('.showBtn').on('click', function (event) {
       event.preventDefault();
@@ -200,25 +218,31 @@
   });
 </script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      let passwordEntered1 = false;
+    function enterNewPw(){
+      const password1 = $('#inputUserPw1').val().trim();
+      const passwordRepeat1 = $('#inputUserRePw1').val().trim();
+      const regex1 = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,15}$/;
 
-      document.getElementById('inputUserPw1').addEventListener('input', function () {
-        passwordEntered1 = true;
-      });
-
-      document.getElementById('inputUserRePw1').addEventListener('input', function () {
-        const password1 = document.getElementById('inputUserPw1').value;
-        const passwordRepeat1 = document.getElementById('inputUserRePw1').value;
-        const passwordMatchMessage1 = document.getElementById('passwordMatchMessage1');
-
-        if (passwordEntered1 && password1 !== passwordRepeat1) {
-          passwordMatchMessage1.style.display = 'block'; // Hiển thị thông báo khi mật khẩu không trùng khớp
+      if (password1.trim() === ""){
+        $('#inputUserPw1').val('');
+        $('#passwordCondition1').css('display', 'block');
+      } else {
+        if (regex1.test(password1.trim())){
+          $('#passwordCondition1').css('display', 'none');
         } else {
-          passwordMatchMessage1.style.display = 'none'; // Ẩn thông báo khi mật khẩu trùng khớp hoặc chưa nhập mật khẩu
+          $('#passwordCondition1').css('display', 'block');
         }
-      });
-    });
+        $('#inputUserPw1').val(password1.trim());
+      }
+
+      if (password1 !== passwordRepeat1) {
+        $('#passwordMatchMessage1').css('display', 'block'); // Hiển thị thông báo khi mật khẩu không trùng khớp
+        document.getElementById('saveNewPw1').disabled = true;
+      } else {
+        $('#passwordMatchMessage1').css('display', 'none'); // Ẩn thông báo khi mật khẩu trùng khớp hoặc chưa nhập mật khẩu
+        document.getElementById('saveNewPw1').disabled = false;
+      }
+    }
 
     function showPassword1() {
       var passwordInput1 = document.getElementById("inputUserPw1");

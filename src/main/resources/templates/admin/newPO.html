@@ -85,6 +85,23 @@
     border-bottom: 1px solid #dee2e6;
   }
 
+  #inputMinQuantity::-webkit-inner-spin-button {
+    position: absolute;
+    left: 0;
+    top:0;
+    bottom: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #inputMinQuantity::-webkit-outer-spin-button {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 </style>
 <body>
   <div th:replace="admin/layout/navbar :: navbar"></div>
@@ -164,7 +181,9 @@
           </div>
           <div class="row px-3 mb-2">
             <div class="col-5">Thời gian lập</div>
-            <div class="col-7 text-end" th:text="${#dates.format(#calendars.createNow(), 'dd/MM/yyyy HH:mm:ss')}"></div>
+            <div class="col-7 text-end">
+              <input type="datetime-local" style="font-size: 14px;" class="form-control border-0" name="timeText" th:value="${formattedDate}" required>
+            </div>
           </div>
           <div class="row px-3 mb-2">
             <div class="col-12">Nhà cung cấp</div>
@@ -275,7 +294,8 @@
                 <div class="mb-3 row">
                   <label for="inputProductID" class="col-sm-3 col-form-label">Mã hàng</label>
                   <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputProductID" name="barcode" placeholder="Mã tự động">
+                    <input type="text" class="form-control" id="inputProductID" name="barcode"
+                           onchange="newProduct()" placeholder="Mã tự động" autocomplete="off">
                     <input type="text" style="display: none;" class="form-control" id="inputID" name="productID">
                   </div>
                 </div>
@@ -283,11 +303,12 @@
                   <label for="inputProductName" class="col-sm-3 col-form-label">Tên hàng <span
                           class="text-danger">*</span></label>
                   <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputProductName" name="productName" required>
+                    <input type="text" class="form-control" id="inputProductName"
+                           name="productName" onchange="newProduct()" required autocomplete="off">
                   </div>
                 </div>
                 <div class="mb-3 row">
-                  <label for="inputCategory" class="col-sm-3 col-form-label  ">Nhóm hàng <span
+                  <label for="inputCategory" class="col-sm-3 col-form-label">Nhóm hàng <span
                           class="text-danger">*</span></label>
                   <div class="col-sm-9">
                     <div class="input-group search_select_box">
@@ -301,15 +322,15 @@
                   </div>
                 </div>
                 <div class="mb-3 row">
-                  <label for="inputProperties" class="col-sm-3 col-form-label  ">Thuộc tính</label>
+                  <label for="inputProperties" class="col-sm-3 col-form-label">Thuộc tính</label>
                   <div class="col-sm-9">
-                    <input type="text" class="form-control" id="inputProperties" name="properties">
+                    <input type="text" class="form-control" id="inputProperties" name="properties" onchange="newProduct()">
                   </div>
                 </div>
                 <div class="mb-3 row">
                   <label for="inputBrand" class="col-sm-3 col-form-label">Thương hiệu</label>
                   <div class="col-sm-9">
-                    <input type="text" list="brands" class="form-control" id="inputBrand" name="brand">
+                    <input type="text" list="brands" class="form-control" id="inputBrand" name="brand" onchange="newProduct()">
                     <datalist id="brands">
                       <option th:each="brand: ${brandList}" th:value="${brand}">
                     </datalist>
@@ -323,20 +344,20 @@
                 <div class="mb-3 row">
                   <label for="inputPrice" class="col-sm-4 col-form-label">Giá bán</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control text-end" id="inputPrice" name="price1">
+                    <input type="text" class="form-control text-end" id="inputPrice" name="price1" autocomplete="off" onchange="checkPriceAndCogs()">
                   </div>
                 </div>
                 <div class="mb-3 row">
                   <label for="inputMinQuantity" class="col-sm-4 col-form-label">Tồn tối thiểu</label>
                   <div class="col-sm-8">
-                    <input type="number" class="form-control text-end" id="inputMinQuantity" name="minQuantity" min="0">
+                    <input type="number" class="form-control text-end" id="inputMinQuantity" name="minQuantity" min="0" onchange="newProduct()">
                   </div>
                 </div>
 
                 <div class="row">
                   <label for="inputUnit" class="col-sm-4 col-form-label">Đơn vị tính</label>
                   <div class="col-sm-8">
-                    <input type="text" list="units" class="form-control" id="inputUnit" name="unit">
+                    <input type="text" list="units" class="form-control" id="inputUnit" name="unit" onchange="newProduct()">
                     <datalist id="units">
                       <option th:each="unit: ${unitList}" th:value="${unit}">
                     </datalist>
@@ -348,15 +369,18 @@
               <label for="inputLocation" class="col-sm-2 col-form-label">Vị trí</label>
               <div class="col-sm-10 ps-0" style="margin-left: -4px;">
                 <div class="tag-container">
-                  <input id="inputLocation1">
+                  <input type="text" id="inputLocation1" onchange="newProduct()">
                 </div>
+                <small id="saveMessage" class="form-text text-danger" style="display:none;">
+                  Sau khi nhập liệu vui lòng nhấn enter để lưu giá trị vị trí.</small>
                 <input type="text" style="display: none;" class="form-control" id="inputLocation" name="location">
               </div>
             </div>
             <div class="row">
               <label for="inputDescription" class="col-sm-2 col-form-label">Mô tả</label>
               <div class="col-sm-10 ps-0" style="margin-left: -4px;">
-                <textarea type="text" class="form-control" id="inputDescription" rows="3" name="description"></textarea>
+                <textarea type="text" class="form-control" id="inputDescription" rows="3" autocomplete="off"
+                          name="description" onchange="newProduct()"></textarea>
               </div>
             </div>
           </div>
@@ -381,12 +405,17 @@
           </div>
           <div class="modal-body">
             <input type="text" class="form-control" id="inputSupplierID"  name="supplierID" style="display: none;">
-
+            <input type="text" id="hiddenSupplierName" style="display: none;">
             <div class="mb-3 row">
               <label for="inputSupplierName" class="col-sm-3 col-form-label">Tên nhà cung cấp <span
                       class="text-danger">*</span></label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputSupplierName" name="supplierName">
+                <input type="text" class="form-control" id="inputSupplierName" name="supplierName"
+                       onchange="supplier()" autocomplete="off" required>
+                <small id="inputNameMessage1" class="form-text text-danger" >
+                  Tên nhà cung cấp không được bỏ trống.</small>
+                <small id="inputNameMessage" class="form-text text-danger" style="display:none;">
+                  Đã có tên nhà cung cấp này trong hệ thống.</small>
               </div>
             </div>
             <div class="mb-3 row">
@@ -403,26 +432,35 @@
               <label for="inputSupplierPhone" class="col-sm-3 col-form-label">Số điện thoại <span
                       class="text-danger">*</span></label>
               <div class="col-sm-9">
-                <input type="tel" class="form-control" id="inputSupplierPhone"  name="phone" pattern="[0]{1}[0-9]{9}">
+                <input type="text" class="form-control" id="inputSupplierPhone" name="phone" autocomplete="off"
+                       required onchange="supplier()">
+                <small id="inputPhoneMessage1" class="form-text text-danger">
+                  Nhập ít nhất một số điện thoại.</small>
+                <small id="inputPhoneMessage" class="form-text text-danger" style="display:none;">
+                  Mỗi số điện thoại hợp lệ sẽ có độ dài từ 10 đến 11 số và chỉ dùng dấu phẩy để phân cách.</small>
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputSupplierAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputSupplierAddress" name="address">
+                <input type="text" class="form-control" id="inputSupplierAddress"
+                       name="address" autocomplete="off" onchange="supplier()">
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputSupplierEmail" class="col-sm-3 col-form-label">Email</label>
               <div class="col-sm-9">
-                <input type="email" class="form-control" id="inputSupplierEmail"  name="email">
+                <input type="text" class="form-control" id="inputSupplierEmail"
+                       name="email" onchange="supplier()" autocomplete="off">
+                <small id="inputEmailMessage" class="form-text text-danger" style="display:none;">
+                  Email không hợp lệ. Vui lòng kiểm tra và nhập lại!</small>
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputSupplierDescription" class="col-sm-3 col-form-label">Ghi chú</label>
               <div class="col-sm-9">
-                            <textarea type="text" class="form-control" id="inputSupplierDescription"
-                                      rows="3" name="description"></textarea>
+                  <textarea type="text" class="form-control" id="inputSupplierDescription"
+                            rows="3" name="description" autocomplete="off" onchange="supplier()"></textarea>
               </div>
             </div>
             <div class="row">
@@ -436,7 +474,7 @@
             </div>
           </div>
           <div class="modal-footer border-0 pt-0">
-            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+            <button type="submit" class="btn btn-success btn-sm" id="saveSupplier" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
                     class="bi bi-x-circle me-2"></i>Đóng
             </button>
@@ -464,7 +502,10 @@
     </div>
   </div>
 
+  <script th:src="@{/js/product.js}"></script>
+
   <script type="text/javascript" th:inline="javascript">
+    const getSupplierNameList = [[${getSupplierNameList}]];
     let availableKeywords = [[${searchP}]];
     const resultsBox = document.querySelector(".result-box");
     const inputBox = document.getElementById("input-box");
@@ -551,6 +592,19 @@
       return number.toLocaleString('vi-VN');
     }
 
+    const priceInput = new AutoNumeric('#inputPrice', config);
+    function checkPriceAndCogs(){
+      const inputPrice = $('#inputPrice').val().replace(/\./g, '');
+
+      if (inputPrice === "" || parseFloat(inputPrice) <= 0){
+        priceInput.set(0);
+        $('#inputPrice').val(priceInput.getFormatted());
+      } else {
+        priceInput.set(inputPrice);
+        $('#inputPrice').val(priceInput.getFormatted());
+      }
+    }
+
     const cogsInputs = document.querySelectorAll('.cogs-input');
     cogsInputs.forEach(input => {
       new AutoNumeric(input, config);
@@ -561,6 +615,13 @@
     });
     const discountAllInput = new AutoNumeric(('.discountAll input'), config);
     const amountPaid = new AutoNumeric(('.amountPaid'), config);
+    $('.amountPaid').on('blur', function() {
+      const amountP = AutoNumeric.getNumber('.amountPaid');
+      if (isNaN(parseFloat(amountP)) || $('.amountPaid').val() == null || $('.amountPaid').val().trim() === "") {
+        amountPaid.set(0);  // Gán lại giá trị mặc định nếu không phải là số
+        return;
+      }
+    });
 
     const cartTotal = $('.cart-total').text().replace(/\./g, '');
     const mustPay = $('.mustPay');
@@ -585,7 +646,7 @@
 
     $('.discountAll input').on('blur', function() {
       const discountAll = AutoNumeric.getNumber('.discountAll input');
-      if (isNaN(parseFloat(discountAll))) {
+      if (isNaN(parseFloat(discountAll)) || $('.discountAll input').val() == null || $('.discountAll input').val().trim() === "") {
         discountAllInput.set(0);  // Gán lại giá trị mặc định nếu không phải là số
         return;
       }
@@ -596,7 +657,7 @@
 
     const tagContainer = document.querySelector('.tag-container');
     const input = document.querySelector('.tag-container input');
-    var tags = [];
+    let tags = [];
     function createTag(label) {
       const div = document.createElement('div');
       div.setAttribute('class', 'tag');
@@ -621,61 +682,72 @@
       tags.slice().reverse().forEach(function (tag) {
         const input = createTag(tag);
         tagContainer.prepend(input);
-      })
+      });
+      updateInputLocation();
     }
 
     input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && input.value.trim() !== null && input.value.trim() !== '') {
         e.preventDefault(); // Ngăn chặn hành động mặc định của nút Enter
-        tags.push(input.value.trim()); // Thêm thẻ vào mảng, loại bỏ khoảng trắng đầu cuối
-        addTags();
-        input.value = '';
+        const newTag = input.value.trim(); // Lấy giá trị mới từ trường input
+        // Kiểm tra xem tag mới có tồn tại trong danh sách tags không
+        if (!tags.includes(newTag)) {
+          tags.push(newTag); // Thêm tag mới vào mảng tags
+          addTags(); // Cập nhật giao diện hiển thị
 
-        let string = '';
-        tags.forEach((item, index) => {
-          string += item;
-          if (index !== tags.length - 1) {
-            string += '|';
-          }
-        });
-        $('#inputLocation').val(string);
-        console.log('add', string);
+          // Cập nhật giá trị của trường inputLocation
+          updateInputLocation();
+        }
+        input.value = '';
+        $('#saveMessage').css('display','none');
+      } else {
+        if ($('#inputLocation1').val().trim() !== ""){
+          $('#saveMessage').css('display','block');
+        } else {
+          $('#saveMessage').css('display','none');
+        }
       }
     });
 
     document.addEventListener('click', function (e) {
       if (e.target.tagName === 'I') {
         const value = e.target.getAttribute('data-item');
-        const index = tags.indexOf(value);
-        tags = [...tags.slice(0, index), ...tags.slice(index + 1)];
+        // const index = tags.indexOf(value);
+        // tags = [...tags.slice(0, index), ...tags.slice(index + 1)];
+        tags = tags.filter(tag => tag !== value);
         addTags();
-        let string = '';
-        tags.forEach((item, index) => {
-          string += item;
-          if (index !== tags.length - 1) {
-            string += '|';
-          }
-        });
-        $('#inputLocation').val(string);
-        console.log('delete', string);
+        updateInputLocation();
       }
     })
 
-    $(document).ready(function () {
-      const priceInput = new AutoNumeric('#inputPrice', config);
+    function updateInputLocation() {
+      let string = '';
+      tags.forEach((item, index) => {
+        string += item;
+        if (index !== tags.length - 1) {
+          string += '|';
+        }
+      });
+      $('#inputLocation').val(string);
+    }
 
+    $(document).ready(function () {
       $('.nBtn').on('click', function (event) {
         event.preventDefault();
         $('#addEditProductLabel').text('Thêm hàng hoá');
         $('#inputID').val('');
         $('#inputProductID').val('');
         $('#inputProductName').val('');
-        $('#inputPrice').val('');
+        priceInput.set(0);
+        $('#inputPrice').val(priceInput.getFormatted());
         $('#inputMinQuantity').val(0);
         $('#inputUnit').val('');
         $('#inputBrand').val('');
         $('#inputCategory').val('');
         $('#inputProperties').val('');
+        reset();
+        tags = [];
+        input.value = '';
         $('#inputLocation').val();
         $('#inputDescription').val('');
         $('#inputImage').val('');
@@ -699,6 +771,20 @@
       $('#addEditSupplier').modal('show');
     });
 
+    function showImageThumbnail(fileInput){
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e){
+        $('#thumbnail').attr('src', e.target.result);
+      };
+
+      reader.readAsDataURL(file);
+    }
+    $('#inputImage').change(function (){
+      showImageThumbnail(this);
+    })
+
     if ([[${messageSuccess}]]) {
       bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
     }
@@ -706,5 +792,6 @@
       bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
     }
   </script>
+  <script th:src="@{/js/supplier.js}"></script>
 </body>
 </html>

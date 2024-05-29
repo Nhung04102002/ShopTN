@@ -95,4 +95,6 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
             "and ((cast(s.supplierID as string) like %?3%) or (s.supplierName like %?3%) or (s.email like %?3%) or (s.phone like %?3%) or (s.address like %?3%) or (?3 is null))")
     int totalAmount2(Long supplierID, List<Integer> status, String keyword);
 
+    @Query("select s.supplierName from Supplier s ")
+    List<String> getSupplierNameList();
 }

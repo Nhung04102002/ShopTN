@@ -89,6 +89,7 @@ public class SupplierController {
         model.addAttribute("listGroup", supplierService.listGroup());
         model.addAttribute("historyTrans", supplierService.historyTrans());
         model.addAttribute("debtSupplier", supplierService.debtSupplier());
+        model.addAttribute("getSupplierNameList", supplierService.getSupplierNameList());
         return "/admin/supplier";
     }
 

@@ -56,7 +56,7 @@
         <div class="col-md-7" style="background-color: #f5ebeb;">
             <div class="mt-3 me-3">
                 <div class="row align-items-center py-2 px-0 mb-2 rounded bg-white"
-                     style="border: 1px solid rgba(161,58,58,0.5);">
+                     style="border: 1px solid rgba(161,58,58,0.5); max-width: 855px; margin-left: 1px;">
                     <div class="col-1 text-center">
                         <button class="cart-count btn rounded-circle btn-sm py-0 px-2" disabled th:text="${COUNT}">0
                         </button>
@@ -69,7 +69,7 @@
                     <div class="col-1"><a th:href="@{/admin/invoice/sell/clear}"
                                           class="btn btn-outline-danger border-0"><i class="bi bi-trash3"></i></a></div>
                 </div>
-                <div id="cartItemList">
+                <div id="cartItemList" style="overflow-y: scroll; height: 330px; overflow-x: hidden; padding-left: 12px; padding-right: 12px;">
                     <div th:each="item : ${CART_ITEMS}">
                         <form th:action="@{/admin/invoice/sell/update}" method="post">
                             <input type="hidden" name="id" th:value="${item.productId}">
@@ -83,13 +83,13 @@
                                            class="border-bottom text-end border-0 w-100 quantity-input" min="1"
                                            th:max="${item.inventory}">
                                 </div>
-                                <div class="col text-end" th:text="${item.price}"></div>
+                                <div class="col text-end" th:text="${#numbers.formatDecimal(item.price, 0, 'POINT', 0, 'COMMA')}"></div>
                                 <div class="col text-end num-container">
-                                    <input type="number" th:value="${item.discount}" name="discountItem"
-                                           onblur="this.form.submit()"
-                                           class="border-bottom text-end border-0 w-75 discount-input" min="0"></div>
+                                    <input type="text" class="border-bottom text-end border-0 w-75 discount-input"
+                                           th:value="${item.discount}"
+                                           name="discountItem" onblur="this.form.submit()"></div>
                                 <div class="col text-end"
-                                     th:text="${(item.price * item.quantity - item.discount)}"></div>
+                                     th:text="${#numbers.formatDecimal(item.price * item.quantity - item.discount, 0, 'POINT', 0, 'COMMA')}"></div>
                                 <div class="col-1 text-center"><a
                                         th:href="@{/admin/invoice/sell/del/{id}(id=${item.productId})}"
                                         class="btn btn-outline-danger border-0"><i class="bi bi-trash3"></i></a></div>
@@ -112,12 +112,12 @@
                                         <p class="m-0">Tiền thừa trả khách</p>
                                     </div>
                                     <div class="col-md-4 text-end">
-                                        <p class="my-2 cart-total" th:text="${TOTAL}" style="margin-right: 2px;"></p>
-                                        <div class="discountAll"><input type="number" value="0" th:field="*{discount}"
+                                        <p class="my-2 cart-total" th:text="${#numbers.formatDecimal(TOTAL, 0, 'POINT', 0, 'COMMA')}" style="margin-right: 2px;"></p>
+                                        <div class="discountAll"><input type="text" value="0" name="discountAll"
                                                                         class="border-bottom text-end mb-3" min="0">
                                         </div>
                                         <p class="mb-2 mt-1 mustPay" style="margin-right: 2px;"></p>
-                                        <div class="cusPay"><input type="number" value="0"
+                                        <div class="cusPay"><input type="text" value="0"
                                                                    class="border-bottom text-end mb-3" min="0"></div>
                                         <p class="mb-0 mt-1 theChange" style="margin-right: 2px;">0</p>
                                     </div>
@@ -194,14 +194,22 @@
                         <label for="inputCustomerName" class="col-sm-3 col-form-label">Tên khách hàng<span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="inputCustomerName" name="customerName">
+                            <input type="text" class="form-control" id="inputCustomerName" name="customerName"
+                                   onchange="customer()" autocomplete="off" required>
+                            <small id="inputNameMessage1" class="form-text text-danger" >
+                                Tên khách hàng không được bỏ trống.</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputCustomerPhone" class="col-sm-3 col-form-label">Số điện thoại <span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <input type="tel" class="form-control" id="inputCustomerPhone" name="phone" pattern="[0]{1}[0-9]{9}">
+                            <input type="text" class="form-control" id="inputCustomerPhone" name="phone"
+                                   onchange="customer()" autocomplete="off" required>
+                            <small id="inputPhoneMessage1" class="form-text text-danger">
+                                Nhập ít nhất một số điện thoại.</small>
+                            <small id="inputPhoneMessage" class="form-text text-danger" style="display:none;">
+                                Mỗi số điện thoại hợp lệ sẽ có độ dài từ 10 đến 11 số và chỉ dùng dấu phẩy để phân cách.</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -218,26 +226,32 @@
                         <label for="inputCustomerDOB" class="col-sm-3 col-form-label">Ngày sinh <span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <input type="date" class="form-control" id="inputCustomerDOB" name="dob" required>
+                            <input type="date" class="form-control" id="inputCustomerDOB" name="dob" required onchange="customer()">
+                            <small id="inputDOBMessage1" class="form-text text-danger">
+                                Ngày sinh không được bỏ trống.</small>
+                            <small id="inputDOBMessage" class="form-text text-danger" style="display: none;"></small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputCustomerAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="inputCustomerAddress" name="address">
+                            <input type="text" class="form-control" id="inputCustomerAddress" name="address"
+                                   onchange="customer()" autocomplete="off" required>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputCustomerEmail" class="col-sm-3 col-form-label">Email</label>
                         <div class="col-sm-9">
-                            <input type="email" class="form-control" id="inputCustomerEmail"  name="email">
+                            <input type="text" class="form-control" id="inputCustomerEmail" name="email" onchange="customer()" autocomplete="off">
+                            <small id="inputEmailMessage" class="form-text text-danger" style="display:none;">
+                                Email không hợp lệ. Vui lòng kiểm tra và nhập lại!</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputCustomerDescription" class="col-sm-3 col-form-label">Ghi chú</label>
                         <div class="col-sm-9">
-                            <textarea type="text" class="form-control" id="inputCustomerDescription"
-                                      rows="3" name="description"></textarea>
+                            <textarea type="text" class="form-control" id="inputCustomerDescription" onchange="customer()"
+                                      rows="3" name="description" autocomplete="off"></textarea>
                         </div>
                     </div>
                     <div class="row">
@@ -251,7 +265,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                    <button type="submit" class="btn btn-success btn-sm" id="saveCustomer" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
                             class="bi bi-x-circle me-2"></i>Đóng
                     </button>
@@ -324,42 +338,72 @@
         }
     }
 
-    const discountAll = $('.discountAll input');
-    const mustPay = $('.mustPay');
-    const cartTotal = $('.cart-total');
-    const cusPay = $('.cusPay input');
-    if (sessionStorage.getItem('discountAll')){
-        discountAll.val(sessionStorage.getItem('discountAll'));
+    const config = {
+        decimalCharacter: ',',
+        digitGroupSeparator: '.',
+        decimalPlaces: 0,
+        showWarnings: false,
+        hoverDecimals: 0
+    };
+    function formatNumber(number) {
+        return number.toLocaleString('vi-VN');
     }
-
-    if (parseFloat(discountAll.val()) === 0){
-        mustPay.text(cartTotal.text());
-    } else {
-        mustPay.text(parseFloat(cartTotal.text()) - parseFloat(discountAll.val()));
-    }
-
-    discountAll.on('blur', function() {
-        if (isNaN(parseFloat(discountAll.val()))) {
-            discountAll.val(0); // Gán lại giá trị mặc định nếu không phải là số
-            return;
-        }
-        mustPay.text(parseFloat(cartTotal.text()) - parseFloat(discountAll.val()));
-        sessionStorage.setItem("discountAll", discountAll.val());
+    const discountItemInputs = document.querySelectorAll('.discount-input');
+    discountItemInputs.forEach(input => {
+        new AutoNumeric(input, config);
     });
 
+    const discountAllInput = new AutoNumeric(('.discountAll input'), config);
+    const cusPayInput = new AutoNumeric(('.cusPay input'), config);
+
+    const mustPay = $('.mustPay');
+    const cartTotal = $('.cart-total').text().replace(/\./g, '');
+
+    if (sessionStorage.getItem('discountAll')){
+        discountAllInput.set(sessionStorage.getItem('discountAll'));
+    }
+    if (parseFloat(cartTotal) === 0){
+        discountAllInput.set(0);
+        sessionStorage.setItem("discountAll", "0");
+    }
+
+    function updateMustPay() {
+        const discountAll = AutoNumeric.getNumber('.discountAll input');
+        if (parseFloat(discountAll) === 0) {
+            mustPay.text(formatNumber(Number(cartTotal)));
+        } else {
+            mustPay.text(formatNumber(Number(cartTotal) - parseFloat(discountAll)));
+        }
+    }
+
+    updateMustPay();
+
+    const discountAll = $('.discountAll input');
+    discountAll.on('blur', function() {
+        const discount = AutoNumeric.getNumber('.discountAll input');
+        if (isNaN(parseFloat(discount)) || discountAll.val() == null || discountAll.val().trim() === "") {
+            discountAllInput.set(0);  // Gán lại giá trị mặc định nếu không phải là số
+            return;
+        }
+        updateMustPay();
+        sessionStorage.setItem("discountAll", discount);
+    });
+
+    const cusPay = $('.cusPay input');
     cusPay.on('blur', function() {
-        if (isNaN(parseFloat(cusPay.val()))) {
-            cusPay.val(0); // Gán lại giá trị mặc định nếu không phải là số
+        const cusPayValue = parseFloat(AutoNumeric.getNumber('.cusPay input'));
+        if (isNaN(cusPayValue) || cusPay.val() == null || cusPay.val().trim() === "") {
+            cusPayInput.set(0); // Gán lại giá trị mặc định nếu không phải là số
+            return;
         }
 
-        const mustPayValue = parseFloat(mustPay.text());
-        const cusPayValue = parseFloat(cusPay.val());
+        const mustPayValue = parseFloat(mustPay.text().replace(/\./g, ''));
 
         if (cusPayValue >= mustPayValue) {
-            $('.theChange').text(cusPayValue - mustPayValue);
-            cusPay.css('color', 'black'); // Sử dụng css() thay vì style
+            $('.theChange').text(formatNumber(Number(cusPayValue - mustPayValue)));
+            $('.cusPay input').css('color', 'black'); // Sử dụng css() thay vì style
         } else {
-            cusPay.css('color', 'red'); // Sử dụng css() thay vì style
+            $('.cusPay input').css('color', 'red'); // Sử dụng css() thay vì style
             alert("Số tiền khách trả phải lớn hơn hoặc bằng số tiền cần trả");
         }
     });
@@ -386,5 +430,6 @@
         bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
     }
 </script>
+<script th:src="@{/js/customer.js}"></script>
 
 </html>

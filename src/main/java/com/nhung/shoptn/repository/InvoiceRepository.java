@@ -87,4 +87,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     @Query("select i from InvoiceDetails i where i.invoice.invoiceID = ?1")
     List<InvoiceDetails> getInvoiceDetailByID(Long invoiceID);
+
+    @Transactional
+    @Modifying
+    @Query("delete InvoiceDetails i where i.invoice.invoiceID = :invoiceID")
+    void deleteIDs(@Param("invoiceID") Long invoiceID);
 }

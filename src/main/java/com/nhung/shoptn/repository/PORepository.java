@@ -85,4 +85,9 @@ public interface PORepository extends JpaRepository<PurchaseReceipt, Long> {
 
     @Query("select po from PODetails po where po.purchaseReceipt.id = ?1")
     List<PODetails> getPODetailByID(Long id);
+
+    @Transactional
+    @Modifying
+    @Query("delete PODetails po where po.purchaseReceipt.id = :id")
+    void deletePODs(@Param("id") Long id);
 }

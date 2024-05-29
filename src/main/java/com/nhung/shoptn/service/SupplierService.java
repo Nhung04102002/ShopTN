@@ -96,4 +96,8 @@ public class SupplierService {
         Pageable pageable = PageRequest.of(pageNo - 1, 10);
         return supplierRepository.filterSupplier2(supplierID, status, keyword, pageable);
     }
+
+    public List<String> getSupplierNameList(){
+        return supplierRepository.getSupplierNameList();
+    }
 }

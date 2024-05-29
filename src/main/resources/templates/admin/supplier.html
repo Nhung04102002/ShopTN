@@ -120,7 +120,7 @@
                                         <span class="input-group-text border-end-0 bg-white" id="basic-addon1"><i
                                                 class="fa-solid fa-magnifying-glass"></i></span>
                                         <input class="form-control border-start-0 ps-0" type="search" id="keyword"
-                                               name="keyword" th:value="${keyword}"
+                                               name="keyword" th:value="${keyword}" autocomplete="off"
                                                placeholder="Mã, tên NCC, SĐT, email, địa chỉ">
                                     </div>
                                     <a th:href="@{/admin/supplier}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
@@ -371,7 +371,7 @@
 <div class="myForm">
     <form th:action="@{/admin/supplier/save/group}" method="post">
         <div class="modal fade" id="editGroup" tabindex="-1" aria-labelledby="editGroupLabel" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
                         <p class="modal-title fs-6 fw-normal text-white" id="editGroupLabel"></p>
@@ -380,10 +380,14 @@
                     <div class="modal-body">
                         <div class="row">
                             <input type="text" class="form-control" id="groupID" name="supplierID" value="" style="display: none;">
-                            <label for="groupName" class="col-sm-5 col-form-label">Tên nhóm nhà cung cấp <span
+                            <input type="text" class="form-control" id="hiddenGroupName" style="display: none;">
+                            <label for="groupName" class="col-sm-3 col-form-label">Tên nhóm nhà cung cấp <span
                                     class="text-danger">*</span></label>
-                            <div class="col-sm-7">
-                                <input type="text" class="form-control" id="groupName" name="supplierName" value="" required>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="groupName" name="supplierName"
+                                       value="" onchange="groupSupplier()" required autocomplete="off">
+                                <small id="inputGroupMessage" class="form-text text-danger" style="display:none;">
+                                    Đã có tên nhóm nhà cung cấp này trong hệ thống.</small>
                             </div>
                         </div>
                     </div>
@@ -429,13 +433,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" class="form-control" id="inputSupplierID"  name="supplierID" style="display: none;">
-
+                    <input type="text" class="form-control" id="inputSupplierID" name="supplierID" style="display: none;">
+                    <input type="text" id="hiddenSupplierName" style="display: none;">
                     <div class="mb-3 row">
                         <label for="inputSupplierName" class="col-sm-3 col-form-label">Tên nhà cung cấp <span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="inputSupplierName" name="supplierName">
+                            <input type="text" class="form-control" id="inputSupplierName" name="supplierName"
+                            onchange="supplier()" autocomplete="off" required>
+                            <small id="inputNameMessage1" class="form-text text-danger" >
+                                Tên nhà cung cấp không được bỏ trống.</small>
+                            <small id="inputNameMessage" class="form-text text-danger" style="display:none;">
+                                Đã có tên nhà cung cấp này trong hệ thống.</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -452,26 +461,35 @@
                         <label for="inputSupplierPhone" class="col-sm-3 col-form-label">Số điện thoại <span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <input type="tel" class="form-control" id="inputSupplierPhone"  name="phone" pattern="[0]{1}[0-9]{9}">
+                            <input type="text" class="form-control" id="inputSupplierPhone" name="phone" autocomplete="off"
+                                    required onchange="supplier()">
+                            <small id="inputPhoneMessage1" class="form-text text-danger">
+                                Nhập ít nhất một số điện thoại.</small>
+                            <small id="inputPhoneMessage" class="form-text text-danger" style="display:none;">
+                                Mỗi số điện thoại hợp lệ sẽ có độ dài từ 10 đến 11 số và chỉ dùng dấu phẩy để phân cách.</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputSupplierAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="inputSupplierAddress" name="address">
+                            <input type="text" class="form-control" id="inputSupplierAddress"
+                                   name="address" autocomplete="off" onchange="supplier()">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputSupplierEmail" class="col-sm-3 col-form-label">Email</label>
                         <div class="col-sm-9">
-                            <input type="email" class="form-control" id="inputSupplierEmail"  name="email">
+                            <input type="text" class="form-control" id="inputSupplierEmail"
+                                   name="email" onchange="supplier()" autocomplete="off">
+                            <small id="inputEmailMessage" class="form-text text-danger" style="display:none;">
+                                Email không hợp lệ. Vui lòng kiểm tra và nhập lại!</small>
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="inputSupplierDescription" class="col-sm-3 col-form-label">Ghi chú</label>
                         <div class="col-sm-9">
                             <textarea type="text" class="form-control" id="inputSupplierDescription"
-                                      rows="3" name="description"></textarea>
+                                      rows="3" name="description" autocomplete="off" onchange="supplier()"></textarea>
                         </div>
                     </div>
                     <div class="row">
@@ -485,10 +503,9 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                    <button type="submit" class="btn btn-success btn-sm" id="saveSupplier" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
-                            class="bi bi-x-circle me-2"></i>Đóng
-                    </button>
+                            class="bi bi-x-circle me-2"></i>Đóng</button>
                 </div>
             </div>
         </form>
@@ -567,8 +584,8 @@
 </script>
 
 <script type="text/javascript" th:inline="javascript">
+    const getSupplierNameList = [[${getSupplierNameList}]];
     $(document).ready(function (){
-
         $('.nBtnC,.eBtnC').on('click', function (event){
             event.preventDefault();
             const href = $(this).attr('href');
@@ -578,6 +595,7 @@
                     $('#editGroupLabel').text('Sửa nhóm nhà cung cấp ' + group.supplierID);
                     $('.myForm #groupID').val(group.supplierID);
                     $('.myForm #groupName').val(group.supplierName);
+                    $('#hiddenGroupName').val(group.supplierName);
                     $('.delBtnC').css('display', 'block');
                     $('.delBtnC').attr('href', '/admin/supplier/delete/' + group.supplierID);
                 });
@@ -710,12 +728,15 @@
                     $('#addEditSupplierLabel').text('Cập nhật thông tin nhà cung cấp');
                     $('#inputSupplierID').val(supplier.supplierID);
                     $('#inputSupplierName').val(supplier.supplierName);
+                    $('#hiddenSupplierName').val(supplier.supplierName);
                     $('#inputSupplierPhone').val(supplier.phone);
                     $('#inputSupplierAddress').val(supplier.address);
                     $('#inputSupplierEmail').val(supplier.email);
                     $('#inputSupplierDescription').val(supplier.description);
                     $('#inputSupplierStatus').val(supplier.isEnable);
                     $('#inputSupplierGroup').val(supplier.parentID.supplierID);
+                    $('#inputNameMessage1').css('display','none');
+                    $('#inputPhoneMessage1').css('display','none');
                 });
                 $('#addEditSupplier').modal('show');
             }
@@ -729,6 +750,8 @@
                 $('#inputSupplierDescription').val('');
                 $('#inputSupplierStatus').val(1);
                 $('#inputSupplierGroup').val('');
+                $('#inputNameMessage1').css('display','block');
+                $('#inputPhoneMessage1').css('display','block');
                 $('#addEditSupplier').modal('show');
             }
         });
@@ -798,4 +821,5 @@
 
 
 </script>
+<script th:src="@{/js/supplier.js}"></script>
 </html>

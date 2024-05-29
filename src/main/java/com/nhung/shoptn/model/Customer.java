@@ -22,7 +22,7 @@ public class Customer {
     @Column(name = "customerName", columnDefinition = "nvarchar(50)", nullable = false)
     private String customerName;
 
-    @Column(columnDefinition = "varchar(11)", nullable = false)
+    @Column(columnDefinition = "varchar(128)", nullable = false)
     private String phone;
 
     private String email;

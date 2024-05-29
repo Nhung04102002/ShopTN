@@ -24,7 +24,7 @@ public class User implements UserDetails {
     @Column(columnDefinition = "nvarchar(100)")
     private String address;
 
-    @Column(columnDefinition = "varchar(11)", nullable = false)
+    @Column(columnDefinition = "varchar(128)", nullable = false)
     private String phone;
 
     private String email;

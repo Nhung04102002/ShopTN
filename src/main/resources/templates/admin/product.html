@@ -49,6 +49,24 @@
   #getSupplier:focus, #getDescription:focus, #getLocation:focus, #getProperties:focus {
     outline: none;
   }
+
+  #inputQuantity::-webkit-inner-spin-button, #inputMinQuantity::-webkit-inner-spin-button {
+    position: absolute;
+    left: 0;
+    top:0;
+    bottom: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  #inputQuantity::-webkit-outer-spin-button, #inputMinQuantity::-webkit-outer-spin-button {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 </style>
 
 <body>
@@ -324,12 +342,16 @@
             <label for="inputCategoryName" class="col-sm-4 col-form-label">Tên nhóm hàng <span
                     class="text-danger">*</span></label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="inputCategoryName" th:field="*{categoryName}" required>
+              <input type="text" class="form-control" id="inputCategoryName" th:field="*{categoryName}"
+                     onchange="newCategory()" required>
+              <small id="inputCategoryMessage" class="form-text text-danger" style="display:none;">
+                Đã có tên nhóm hàng này trong hệ thống.</small>
             </div>
           </div>
         </div>
         <div class="modal-footer border-0 pt-0">
-          <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+          <button type="submit" class="btn btn-success btn-sm" id="submitNewCategory" disabled>
+            <i class="bi bi-floppy-fill me-2"></i>Lưu</button>
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
                   class="bi bi-x-circle me-2"></i>Đóng
           </button>
@@ -351,16 +373,21 @@
           <div class="modal-body">
             <div class="row">
               <input type="text" class="form-control" id="categoryID" name="categoryID" value="" style="display: none;">
+              <input type="text" class="form-control" id="hiddenCategoryName" style="display: none;">
               <label for="categoryName" class="col-sm-4 col-form-label">Tên nhóm hàng <span
                       class="text-danger">*</span></label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="categoryName" name="categoryName" value="" required>
+                <input type="text" class="form-control" id="categoryName" name="categoryName"
+                       value="" onchange="updateCategory()" required>
+                <small id="inputCategoryMessage1" class="form-text text-danger" style="display:none;">
+                  Đã có tên nhóm hàng này trong hệ thống.</small>
               </div>
             </div>
           </div>
           <div class="modal-footer border-0 pt-0">
             <a href="" class="btn btn-danger delBtnC btn-sm"><i class="bi bi-check-circle me-2"></i>Xoá</a>
-            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+            <button type="submit" class="btn btn-success btn-sm" id="submitUpdateCategory">
+              <i class="bi bi-floppy-fill me-2"></i>Lưu</button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
                     class="bi bi-x-circle me-2"></i>Đóng
             </button>
@@ -395,7 +422,7 @@
     <form th:action="@{/admin/product/save}" method="post" enctype="multipart/form-data" id="saveForm">
       <div class="modal-content">
       <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
-        <h1 class="modal-title fs-5 fw-normal text-white" id="addEditProductLabel"></h1>
+        <h1 class="modal-title fs-6 fw-normal text-white" id="addEditProductLabel"></h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -410,7 +437,8 @@
             <div class="mb-3 row">
               <label for="inputProductID" class="col-sm-3 col-form-label">Mã hàng</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputProductID" name="barcode" placeholder="Mã tự động">
+                <input type="text" class="form-control" id="inputProductID" onchange="newProduct()"
+                       name="barcode" placeholder="Mã tự động" autocomplete="off">
                 <input type="text" style="display: none;" class="form-control" id="inputID" name="productID">
               </div>
             </div>
@@ -418,11 +446,12 @@
               <label for="inputProductName" class="col-sm-3 col-form-label">Tên hàng <span
                       class="text-danger">*</span></label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputProductName" name="productName" required>
+                <input type="text" class="form-control" id="inputProductName" autocomplete="off"
+                       name="productName" onchange="newProduct()" required>
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="inputCategory" class="col-sm-3 col-form-label  ">Nhóm hàng <span
+              <label for="inputCategory" class="col-sm-3 col-form-label">Nhóm hàng <span
                       class="text-danger">*</span></label>
               <div class="col-sm-9">
                 <div class="input-group search_select_box">
@@ -437,15 +466,17 @@
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="inputProperties" class="col-sm-3 col-form-label  ">Thuộc tính</label>
+              <label for="inputProperties" class="col-sm-3 col-form-label">Thuộc tính</label>
               <div class="col-sm-9">
-                <input type="text" class="form-control" id="inputProperties" name="properties">
+                <input type="text" class="form-control" id="inputProperties"
+                       placeholder="Màu:Xanh|Size:XL" onblur="newProduct()"
+                       name="properties">
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputBrand" class="col-sm-3 col-form-label">Thương hiệu</label>
               <div class="col-sm-9">
-                <input type="text" list="brands" class="form-control" id="inputBrand" name="brand">
+                <input type="text" list="brands" class="form-control" id="inputBrand" name="brand" onchange="newProduct()">
                 <datalist id="brands">
                   <option th:each="brand: ${brandList}" th:value="${brand}">
                 </datalist>
@@ -455,15 +486,18 @@
               <label for="inputLocation" class="col-sm-3 col-form-label">Vị trí</label>
               <div class="col-sm-9">
                 <div class="tag-container">
-                  <input id="inputLocation1">
+                  <input type="text" id="inputLocation1" onchange="newProduct()">
+                  <small id="saveMessage" class="form-text text-danger" style="display:none;">
+                    Sau khi nhập liệu vui lòng nhấn enter để lưu giá trị vị trí.</small>
                 </div>
                 <input type="text" style="display: none;" class="form-control" id="inputLocation" name="location">
               </div>
             </div>
             <div class="row">
-              <label for="inputDescription" class="col-sm-3 col-form-label  ">Mô tả</label>
+              <label for="inputDescription" class="col-sm-3 col-form-label">Mô tả</label>
               <div class="col-sm-9">
-                <textarea type="text" class="form-control" id="inputDescription" rows="3" name="description"></textarea>
+                <textarea type="text" class="form-control" id="inputDescription" onchange="newProduct()"
+                          rows="3" name="description"></textarea>
               </div>
             </div>
           </div>
@@ -473,33 +507,35 @@
             <div class="mb-3 row">
               <label for="inputPrice" class="col-sm-4 col-form-label">Giá bán</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control text-end" id="inputPrice" name="price1">
+                <input type="text" class="form-control text-end" id="inputPrice" name="price1" autocomplete="off" onchange="checkPriceAndCogs()">
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputCogs" class="col-sm-4 col-form-label">Giá vốn</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control text-end" id="inputCogs" name="cogs1">
+                <input type="text" class="form-control text-end" id="inputCogs" name="cogs1" autocomplete="off" onchange="checkPriceAndCogs()">
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputQuantity" class="col-sm-4 col-form-label">Tồn kho <span
                       class="text-danger">*</span></label>
               <div class="col-sm-8">
-                <input type="number" class="form-control text-end" id="inputQuantity" name="quantity" min="0" required>
+                <input type="number" class="form-control text-end" id="inputQuantity" onchange="newProduct()"
+                       name="quantity" min="0" required>
               </div>
             </div>
             <div class="mb-3 row">
               <label for="inputMinQuantity" class="col-sm-4 col-form-label">Tồn tối thiểu</label>
               <div class="col-sm-8">
-                <input type="number" class="form-control text-end" id="inputMinQuantity" name="minQuantity" min="0">
+                <input type="number" class="form-control text-end" id="inputMinQuantity"
+                       name="minQuantity" onchange="newProduct()" min="0">
               </div>
             </div>
 
             <div class="row">
               <label for="inputUnit" class="col-sm-4 col-form-label">Đơn vị tính</label>
               <div class="col-sm-8">
-                <input type="text" list="units" class="form-control" id="inputUnit" name="unit">
+                <input type="text" list="units" class="form-control" id="inputUnit" name="unit" onchange="newProduct()">
                 <datalist id="units">
                   <option th:each="unit: ${unitList}" th:value="${unit}">
                 </datalist>
@@ -523,7 +559,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
-        <h1 class="modal-title fs-5 ms-3 fw-normal text-white" id="showProductLabel" name="productName"></h1>
+        <h1 class="modal-title fs-6 fw-normal text-white" id="showProductLabel" name="productName"></h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -637,19 +673,20 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
-        <h1 class="modal-title fs-5 fw-normal text-white" id="deleteProductLabel">Xác nhận xoá mặt hàng</h1>
+        <h1 class="modal-title fs-6 fw-normal text-white" id="deleteProductLabel">Xác nhận xoá mặt hàng</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="fs-6 m-0" id="delProduct"></p>
+        <p class="m-0" id="delProduct"></p>
       </div>
       <div class="modal-footer border-0 pt-0">
-        <a href="" id="deleted" class="btn btn-danger"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+        <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
       </div>
     </div>
   </div>
 </div>
+
 <!-- Thông báo thành công -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -670,6 +707,7 @@
 </div>
 
 <script type="text/javascript" th:inline="javascript">
+  const categoryList = [[${categoryList}]];
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
@@ -717,6 +755,13 @@
         updateInputLocation();
       }
       input.value = '';
+      $('#saveMessage').css('display','none');
+    } else {
+      if ($('#inputLocation1').val().trim() !== ""){
+        $('#saveMessage').css('display','block');
+      } else {
+        $('#saveMessage').css('display','none');
+      }
     }
   });
 
@@ -742,20 +787,40 @@
     $('#inputLocation').val(string);
   }
 
+  const formatter = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  });
+  const config = {
+    decimalCharacter: ',',
+    digitGroupSeparator: '.',
+    decimalPlaces: 0,
+    showWarnings: false,
+    hoverDecimals: 0
+  };
+  const priceInput = new AutoNumeric('#inputPrice', config);
+  const cogsInput = new AutoNumeric('#inputCogs', config);
+
+  function checkPriceAndCogs(){
+    const inputPrice = $('#inputPrice').val().replace(/\./g, '');
+    const inputCogs = $('#inputCogs').val().replace(/\./g, '');
+
+    if (inputPrice === "" || parseFloat(inputPrice) <= 0){
+      priceInput.set(0);
+      $('#inputPrice').val(priceInput.getFormatted());
+    } else {
+      priceInput.set(inputPrice);
+      $('#inputPrice').val(priceInput.getFormatted());
+    }
+    if (inputCogs === "" || parseFloat(inputCogs) <= 0){
+      cogsInput.set(0);
+      $('#inputCogs').val(cogsInput.getFormatted());
+    } else {
+      cogsInput.set(inputCogs);
+      $('#inputCogs').val(cogsInput.getFormatted());
+    }
+  }
   $(document).ready(function (){
-    const formatter = new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    });
-    const config = {
-      decimalCharacter: ',',
-      digitGroupSeparator: '.',
-      decimalPlaces: 0,
-      showWarnings: false,
-      hoverDecimals: 0
-    };
-    const priceInput = new AutoNumeric('#inputPrice', config);
-    const cogsInput = new AutoNumeric('#inputCogs', config);
 
     $('.eBtnC').on('click', function (event){
       event.preventDefault();
@@ -763,6 +828,7 @@
       $.get(href, function (category){
         $('.myForm #getCategoryID').text(category.categoryID);
         $('.myForm #categoryID').val(category.categoryID);
+        $('#hiddenCategoryName').val(category.categoryName);
         $('.myForm #categoryName').val(category.categoryName);
         $('.delBtnC').attr('href', '/admin/category/delete?categoryID=' + category.categoryID);
       });
@@ -862,8 +928,10 @@
         $('#inputID').val('');
         $('#inputProductID').val('');
         $('#inputProductName').val('');
-        $('#inputPrice').val('');
-        $('#inputCogs').val('');
+        priceInput.set(0);
+        cogsInput.set(0);
+        $('#inputPrice').val(priceInput.getFormatted());
+        $('#inputCogs').val(cogsInput.getFormatted());
         $('#inputQuantity').val(0);
         $('#inputMinQuantity').val(0);
         $('#inputUnit').val('');
@@ -880,6 +948,7 @@
         $('#addEditProduct').modal('show');
       }
     });
+
     function showImageThumbnail(fileInput){
       const file = fileInput.files[0];
       const reader = new FileReader();
@@ -899,7 +968,7 @@
       const href = $(this).attr('href');
       $.get(href, function (product){
         $('#deactivated').attr('href', '/admin/product/deactivate/' + product.productID);
-        $('#discontinue #stopProduct').text('Bạn có chắc chắn muốn ngừng bán mặt hàng ' + product.productName + ' ? Thông tin và dữ liệu của mặt hàng này vẫn sẽ được giữ.');
+        $('#discontinue #stopProduct').text('Bạn có chắc chắn muốn ngừng bán mặt hàng "' + product.productName + '"? Thông tin và dữ liệu của mặt hàng này vẫn sẽ được giữ.');
       });
       $('#discontinue').modal('show');
     });
@@ -909,7 +978,7 @@
       const href = $(this).attr('href');
       $.get(href, function (product){
         $('#deleted').attr('href', '/admin/product/delete/' + product.productID);
-        $('#deleteProduct #delProduct').text('Hệ thống sẽ xóa hoàn toàn mặt hàng ' + product.productName + ' nhưng vẫn giữ những giao dịch lịch sử nếu có. Bạn có chắc chắn muốn xóa?');
+        $('#deleteProduct #delProduct').text('Hệ thống sẽ xóa hoàn toàn mặt hàng "' + product.productName + '" nhưng vẫn giữ những giao dịch lịch sử nếu có. Bạn có chắc chắn muốn xóa?');
       });
       $('#deleteProduct').modal('show');
     });
@@ -993,5 +1062,6 @@
 
   });
 </script>
+<script th:src="@{/js/product.js}"></script>
 </body>
 </html>

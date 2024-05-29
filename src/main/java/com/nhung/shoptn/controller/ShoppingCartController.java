@@ -90,14 +90,30 @@ public class ShoppingCartController {
     @PostMapping("/invoice/sell/update")
     public String update(@RequestParam("id") Long id,
                          @RequestParam("quantity") Integer quantity,
-                         @RequestParam("discountItem") Integer discount){
-        cartService.update(id, quantity, discount);
+                         @RequestParam("discountItem") String discount){
+        int discount1;
+        if (discount != null && !discount.trim().equals("")){
+            if (discount.contains(".")) {
+                discount1 = Integer.parseInt(discount.replace(".", ""));
+            } else {
+                discount1 = Integer.parseInt(discount);
+            }
+        } else {
+            discount1 = 0;
+        }
+
+        cartService.update(id, quantity, discount1);
         return "redirect:/admin/invoice/sell";
     }
 
     @PostMapping("/invoice/sell/checkout")
-    public String checkout(Invoice invoice, RedirectAttributes ra){
+    public String checkout(Invoice invoice, @RequestParam(name = "discountAll") String discountAll, RedirectAttributes ra){
         try {
+            if (discountAll.contains(".")){
+                invoice.setDiscount(Integer.parseInt(discountAll.replace(".", "")));
+            } else {
+                invoice.setDiscount(Integer.parseInt(discountAll));
+            }
             invoice.setStatus(1);
             invoice.setTime(new Date());
             invoice.setUser(loggedInUser());
@@ -113,9 +129,9 @@ public class ShoppingCartController {
                 productRepository.updateQuantity(product.getQuantity()-item.getQuantity(), product.getProductID());
             }
             cartService.clear();
-            ra.addFlashAttribute("messageSuccess", "Cập nhật hoá đơn thành công!");
+            ra.addFlashAttribute("messageSuccess", "Thêm mới hoá đơn thành công!");
         } catch (DatabaseAccessException e){
-            ra.addFlashAttribute("messageFail", "Cập nhật hoá đơn thất bại!");
+            ra.addFlashAttribute("messageFail", "Thêm mới hoá đơn thất bại!");
         }
         return "redirect:/admin/invoice/sell";
     }
@@ -124,9 +140,9 @@ public class ShoppingCartController {
     public String addNewCustomer(Customer customer, RedirectAttributes ra){
         try {
             customerRepository.save(customer);
-            ra.addFlashAttribute("messageSuccess", "Cập nhật dữ liệu thành công!");
+            ra.addFlashAttribute("messageSuccess", "Thêm mới khách hàng thành công!");
         }catch (DatabaseAccessException e){
-            ra.addFlashAttribute("messageFail", "Cập nhật dữ liệu thất bại!");
+            ra.addFlashAttribute("messageFail", "Thêm mới khách hàng thất bại!");
         }
         return "redirect:/admin/invoice/sell";
     }

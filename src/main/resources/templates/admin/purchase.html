@@ -205,6 +205,9 @@
                                     <a class="btn text-primary px-1 sBtn" th:href="@{/admin/PurchaseOrder/findPO(id=${po[6]})}"><i
                                             class="bi bi-info-circle-fill"></i></a>
                                 </span>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Sửa" th:if="${po[5] != 0}">
+                                      <a th:href="@{'/admin/PurchaseOrder/edit/'+${po[6]}}" target="_blank" class="btn text-success px-1"><i class="bi bi-pencil-square"></i></a>
+                                </span>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Huỷ" th:if="${po[5] != 0}">
                                       <a th:href="@{/admin/PurchaseOrder/findPO(id=${po[6]})}" class="btn text-danger px-1 delBtn"><i class="fa-solid fa-ban"></i></a>
                                 </span>
@@ -344,22 +347,39 @@
     </div>
 </div>
 
-
 <!-- Xoá -->
 <div class="modal fade" id="deleteProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteProductLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="deleteProductLabel">Xác nhận huỷ phiếu nhập</h1>
+            <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                <h1 class="modal-title fs-6 fw-normal text-white" id="deleteProductLabel">Xác nhận huỷ phiếu nhập</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p id="delProduct"></p>
+                <p class="m-0" id="delProduct"></p>
             </div>
-            <div class="modal-footer">
-                <a href="" id="deleted" class="btn btn-danger"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
+            <div class="modal-footer border-0 pt-0">
+                <a href="" id="deleted" class="btn btn-danger btn-sm"><i class="bi bi-check-circle me-2"></i>Đồng ý</a>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i>Đóng</button>
             </div>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -367,6 +387,12 @@
 <script type="text/javascript" th:inline="javascript">
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    if ([[${messageSuccess}]]) {
+        bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+    }
+    if ([[${messageFail}]]) {
+        bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+    }
     $(document).ready(function (){
 
         $('.sBtn').on('click', function (event){
@@ -434,13 +460,13 @@
 
 
         $('.delBtn').on('click', function (event){
-          event.preventDefault();
-          const href = $(this).attr('href');
-          $.get(href, function (po){
-            $('#deleted').attr('href', '/admin/PurchaseOrder/cancel/' + po.id);
-            $('#deleteProduct #delProduct').text('Hệ thống sẽ xóa huỷ phiếu nhập ' + po.purchaseID + ' và cập nhật lại số lượng hàng hoá. Bạn có chắc chắn muốn huỷ?');
-          });
-          $('#deleteProduct').modal('show');
+            event.preventDefault();
+            const href = $(this).attr('href');
+            $.get(href, function (po){
+                $('#deleted').attr('href', '/admin/PurchaseOrder/cancel/' + po.id);
+                $('#deleteProduct #delProduct').text('Hệ thống sẽ xóa huỷ phiếu nhập ' + po.purchaseID + ' và cập nhật lại số lượng hàng hoá. Bạn có chắc chắn muốn huỷ?');
+            });
+            $('#deleteProduct').modal('show');
         });
 
         $("#today, #yesterday, #anotherChoice").change(function() {
@@ -525,5 +551,6 @@
         });
     });
 </script>
+
 </body>
 </html>

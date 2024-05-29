@@ -126,6 +126,7 @@ public class InvoiceController {
 
     @GetMapping("/invoice/cancel/{invoiceID}")
     public String cancelInvoice(@PathVariable Long invoiceID, RedirectAttributes ra){
+        Invoice invoice = invoiceService.findByInvoiceID(invoiceID);
         try {
             invoiceService.cancelInvoice(invoiceID);
             List<InvoiceDetails> invoiceDetails = invoiceService.getInvoiceDetailByID(invoiceID);
@@ -133,9 +134,9 @@ public class InvoiceController {
                 Product product = productRepository.findByProductID(item.getProduct().getProductID());
                 productRepository.updateQuantity(product.getQuantity()+item.getQuantity(), product.getProductID());
             }
-            ra.addFlashAttribute("messageSuccess", "Huỷ hoá đơn thành công!");
+            ra.addFlashAttribute("messageSuccess", "Huỷ hoá đơn " + invoice.getCode() + " thành công!");
         } catch (DatabaseAccessException e){
-            ra.addFlashAttribute("messageFail", "Huỷ hoá đơn thất bại!");
+            ra.addFlashAttribute("messageFail", "Huỷ hoá đơn " + invoice.getCode() + " thất bại!");
         }
         return "redirect:/admin/invoice";
     }

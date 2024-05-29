@@ -21,7 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
@@ -140,6 +144,9 @@ public class POController {
         model.addAttribute("accList", accountRepository.findAll());
         model.addAttribute("sList", productRepository.getSupplierList());
         model.addAttribute("listGroup", supplierRepository.listGroup());
+        model.addAttribute("getSupplierNameList", supplierRepository.getSupplierNameList());
+        String formattedDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        model.addAttribute("formattedDate", formattedDate);
         return "/admin/newPO";
     }
 
@@ -163,7 +170,7 @@ public class POController {
                 }
             }
 
-            ra.addFlashAttribute("messageSuccess", "Huỷ phiếu nhập" + purchaseReceipt.getPurchaseID() + "thành công!");
+            ra.addFlashAttribute("messageSuccess", "Huỷ phiếu nhập " + purchaseReceipt.getPurchaseID() + " thành công!");
         } catch (DatabaseAccessException e){
             ra.addFlashAttribute("messageFail", "Huỷ phiếu nhập " + purchaseReceipt.getPurchaseID() + " thất bại!");
         }
@@ -205,16 +212,24 @@ public class POController {
                          @RequestParam("quantity") Integer quantity,
                          @RequestParam("discountItem") String discount) {
         int discount1, cogs1;
-        if (cogs.contains(".")) {
-            cogs1 = Integer.parseInt(cogs.replace(".", ""));
+        if (discount != null && !discount.trim().equals("")){
+            if (discount.contains(".")) {
+                discount1 = Integer.parseInt(discount.replace(".", ""));
+            } else {
+                discount1 = Integer.parseInt(discount);
+            }
         } else {
-            cogs1 = Integer.parseInt(cogs);
+            discount1 = 0;
         }
 
-        if (discount.contains(".")) {
-            discount1 = Integer.parseInt(discount.replace(".", ""));
+        if (cogs != null && !cogs.trim().equals("")){
+            if (cogs.contains(".")) {
+                cogs1 = Integer.parseInt(cogs.replace(".", ""));
+            } else {
+                cogs1 = Integer.parseInt(cogs);
+            }
         } else {
-            discount1 = Integer.parseInt(discount);
+            cogs1 = 0;
         }
         purchaseOrderService.update(id, cogs1, quantity, discount1);
         return "redirect:/admin/PurchaseOrder/new";
@@ -258,9 +273,9 @@ public class POController {
                     productRepository.save(product);
                 }
             }
-            ra.addFlashAttribute("messageSuccess", "Cập nhật dữ liệu thành công!");
+            ra.addFlashAttribute("messageSuccess", "Thêm mới hàng hoá thành công!");
         } catch (DatabaseAccessException e) {
-            ra.addFlashAttribute("messageFail", "Cập nhật dữ liệu thất bại!");
+            ra.addFlashAttribute("messageFail", "Thêm mới hàng hoá thất bại!");
         }
         return "redirect:/admin/PurchaseOrder/new";
     }
@@ -273,21 +288,36 @@ public class POController {
     public String importProduct(PurchaseReceipt po, @RequestParam(name = "action") String action,
                                 @RequestParam(name = "discountAll") String discountAll,
                                 @RequestParam(name = "amountPaidText") String amountPaid,
+                                @RequestParam(name = "timeText") String timeText,
                                 RedirectAttributes ra){
         try {
-            po.setTime(new Date());
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+                po.setTime(formatter.parse(timeText));
+            } catch (ParseException e){
+                ra.addFlashAttribute("messageFail", "Định dạng ngày giờ không hợp lệ.");
+            }
             po.setUser(loggedInUser());
             String nextID = String.format("%06d", poRepository.getMaxId()+1);
             po.setPurchaseID("PO" + nextID);
-            if (discountAll.contains(".")){
-                po.setDiscount(Integer.parseInt(discountAll.replace(".", "")));
+            if (discountAll != null && !discountAll.trim().equals("")){
+                if (discountAll.contains(".")){
+                    po.setDiscount(Integer.parseInt(discountAll.replace(".", "")));
+                } else {
+                    po.setDiscount(Integer.parseInt(discountAll));
+                }
             } else {
-                po.setDiscount(Integer.parseInt(discountAll));
+                po.setDiscount(0);
             }
-            if (amountPaid.contains(".")){
-                po.setAmountPaid(Long.parseLong(amountPaid.replace(".", "")));
+
+            if (amountPaid != null && !amountPaid.trim().equals("")){
+                if (amountPaid.contains(".")){
+                    po.setAmountPaid(Long.parseLong(amountPaid.replace(".", "")));
+                } else {
+                    po.setAmountPaid(Long.parseLong(amountPaid));
+                }
             } else {
-                po.setAmountPaid(Long.parseLong(amountPaid));
+                po.setAmountPaid(0L);
             }
 
             if (po.getStatusPay() == 0){
@@ -327,9 +357,9 @@ public class POController {
                 }
             }
             purchaseOrderService.clear();
-            ra.addFlashAttribute("messageSuccess", "Cập nhật hoá đơn thành công!");
+            ra.addFlashAttribute("messageSuccess", "Thêm mới phiếu nhập thành công!");
         } catch (DatabaseAccessException e){
-            ra.addFlashAttribute("messageFail", "Cập nhật hoá đơn thất bại!");
+            ra.addFlashAttribute("messageFail", "Thêm mới phiếu nhập thất bại!");
         }
 
         return "redirect:/admin/PurchaseOrder/new";
@@ -339,9 +369,9 @@ public class POController {
     public String addNewSupplier(Supplier supplier, RedirectAttributes ra){
         try {
             supplierRepository.save(supplier);
-            ra.addFlashAttribute("messageSuccess", "Cập nhật dữ liệu thành công!");
+            ra.addFlashAttribute("messageSuccess", "Thêm mới nhà cung cấp thành công!");
         } catch (DataAccessException e){
-            ra.addFlashAttribute("messageFail", "Cập nhật dữ liệu thất bại!");
+            ra.addFlashAttribute("messageFail", "Thêm mới nhà cung cấp thất bại!");
         }
         return "redirect:/admin/PurchaseOrder/new";
     }

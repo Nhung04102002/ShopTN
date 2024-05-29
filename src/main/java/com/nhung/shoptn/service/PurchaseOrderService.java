@@ -1,6 +1,7 @@
 package com.nhung.shoptn.service;
 
 import com.nhung.shoptn.dto.PurchaseOrder;
+import com.nhung.shoptn.dto.EditPO;
 
 import java.util.Collection;
 
@@ -18,4 +19,5 @@ public interface PurchaseOrderService {
     int getCount();
 
     int getAmount();
+
 }

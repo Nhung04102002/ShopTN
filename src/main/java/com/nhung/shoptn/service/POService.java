@@ -23,7 +23,7 @@ public class POService {
         return poRepository.filterPO(dateStart,dateEnd, creator, method, status, keyword, pageable);
     }
 
-    public void cancelPO(@Param("id") Long id){
+    public void cancelPO(Long id){
         poRepository.cancelPO(id);
     }
 
@@ -33,5 +33,9 @@ public class POService {
 
     public PurchaseReceipt findByPOID(Long id){
         return poRepository.findByPOID(id);
+    }
+
+    public void deletePODs(Long id){
+        poRepository.deletePODs(id);
     }
 }
