@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Cập nhật hoá đơn '+${editInvoice.getCode()}"></title>
+    <div th:replace="admin/layout/head :: head"></div>
+    <link rel="stylesheet" th:href="@{/css/admin/newInvoice.css}">
+</head>
+
+<body style="overflow-y: hidden;">
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5 shadow-sm" style="background-color: #f5ebeb;">
+            <form class="d-flex my-3" role="search">
+                <div class="search input-group">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input class="form-control border-start-0 ps-0" type="text" th:value="${keyword}" name="keyword" id="search-item"
+                           placeholder="Mã hàng, mã vạch, tên hàng" onkeyup="search()">
+                </div>
+
+            </form>
+            <div class="product-list" id="product-list">
+                <div class="card product" th:each="product : ${pList}" th:if="${product.status == 1}">
+                    <div class="row g-0">
+                        <div class="col-md-4 rounded-start border-end">
+                            <img th:if="${product.image != null && product.image.length() > 0}"
+                                 th:src="@{${product.getImagePath()}}" class="img-fluid rounded-start">
+                            <img th:if="${product.image == null || product.image.length() == 0}"
+                                 src="/images/image0.jpg" class="img-fluid rounded-start">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body p-details">
+                                <h2>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="cardID" th:text="${product.barcode}"></p>
+                                        <p class="mb-0 text-primary-emphasis inventory"
+                                           th:text="'x'+${product.quantity}"></p>
+                                    </div>
+                                    <p class="card-text truncate-text card--title" th:text="${product.productName}"></p>
+                                </h2>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-0 text-danger price"
+                                        th:text="${#numbers.formatCurrency(product.price)}"></h6>
+                                    <a th:href="@{'/admin/invoice/edit/'+${editInvoice.getInvoiceID()}+'/add/'+${product.productID}}"
+                                       class="btn btn-bd-cart border-0 add-to-cart"><i class="bi bi-bag-heart"></i></a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7" style="background-color: #f5ebeb;">
+            <div class="mt-3 me-3">
+                <div class="row align-items-center py-2 px-0 mb-2 rounded bg-white"
+                     style="border: 1px solid rgba(161,58,58,0.5);">
+                    <div class="col-1 text-center">
+                        <button class="cart-count btn rounded-circle btn-sm py-0 px-2" disabled th:text="${COUNT}">0
+                        </button>
+                    </div>
+                    <div class="col-4">Tên hàng</div>
+                    <div class="col-1 text-end">SL</div>
+                    <div class="col text-end">Giá bán</div>
+                    <div class="col text-end">Giảm giá</div>
+                    <div class="col text-end">Thành tiền</div>
+                    <div class="col-1"><a th:href="@{'/admin/invoice/edit/'+${editInvoice.getInvoiceID()}+'/clear'}"
+                                          class="btn btn-outline-danger border-0"><i class="bi bi-trash3"></i></a></div>
+                </div>
+                <div id="cartItemList">
+                    <div th:each="item : ${CART_ITEMS}">
+                        <form th:action="@{'/admin/invoice/edit/'+${editInvoice.getInvoiceID()}+'/update'}" method="post">
+                            <input type="hidden" name="id" th:value="${item.productId}">
+                            <div class="row align-items-center py-2 px-0 mb-2 rounded bg-white"
+                                 style="border: 1px solid rgba(161,58,58,0.5);">
+                                <div class="col-1 text-center" th:text="${item.productId}"></div>
+                                <div class="col-4 truncate-text" th:text="${item.name}"></div>
+                                <div class="col-1 text-end num-container">
+                                    <input type="number" th:value="${item.quantity}" name="quantity"
+                                           onblur="this.form.submit()"
+                                           class="border-bottom text-end border-0 w-100 quantity-input" min="1"
+                                           th:max="${item.inventory}">
+                                </div>
+                                <div class="col text-end" th:text="${#numbers.formatDecimal(item.price, 0, 'POINT', 0, 'COMMA')}"></div>
+                                <div class="col text-end num-container">
+                                    <input type="text" class="border-bottom text-end border-0 w-75 discount-input"
+                                           th:value="${item.discount}"
+                                           name="discountItem" onblur="this.form.submit()"></div>
+                                <div class="col text-end"
+                                     th:text="${#numbers.formatDecimal(item.price * item.quantity - item.discount, 0, 'POINT', 0, 'COMMA')}"></div>
+                                <div class="col-1 text-center"><a
+                                        th:href="@{'/admin/invoice/edit/'+${editInvoice.getInvoiceID()}+'/del/'+${item.productId}}"
+                                        class="btn btn-outline-danger border-0"><i class="bi bi-trash3"></i></a></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="pay">
+                <div class="footer p-3">
+                    <form th:action="@{'/admin/invoice/edit/'+${editInvoice.getInvoiceID()}+'/checkout'}" method="post" th:object="${newInvoice}">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="mt-2">Tổng tiền hàng</p>
+                                        <p>Giảm giá</p>
+                                        <p>Tiền cần trả</p>
+                                        <p>Khách trả</p>
+                                        <p class="m-0">Tiền thừa trả khách</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <p class="my-2 cart-total" th:text="${#numbers.formatDecimal(TOTAL, 0, 'POINT', 0, 'COMMA')}" style="margin-right: 2px;"></p>
+                                        <div class="discountAll"><input type="text" value="0" name="discountAll" th:value="${editInvoice.getDiscount()}"
+                                                                        class="border-bottom text-end mb-3" min="0">
+                                        </div>
+                                        <p class="mb-2 mt-1 mustPay" style="margin-right: 2px;"></p>
+                                        <div class="cusPay"><input type="text" value="0"
+                                                                   class="border-bottom text-end mb-3" min="0"></div>
+                                        <p class="mb-0 mt-1 theChange" style="margin-right: 2px;">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 border-start border-end">
+                                <p class="mt-2 mb-1">Khách hàng</p>
+                                <div class="input-group rounded" style="border: 1px solid rgba(161,58,58,0.5);">
+                                    <input type="text" class="form-control border-0" placeholder="Tìm khách hàng..."
+                                           list="cusList" name="customer" th:value="${editInvoice.customer.customerID}" required>
+                                    <datalist id="cusList" style="max-height: 200px; overflow-y: auto;">
+                                        <option th:each="cus:${cList}" th:if="${cus.isEnable != 0}"
+                                                th:value="${cus.customerID}"
+                                                th:text="${cus.customerName+' - '+cus.phone}"></option>
+                                    </datalist>
+                                    <button class="btn btn-outline-secondary border-0 nBtnCus" type="button"><i
+                                            class="fa-solid fa-circle-plus"></i></button>
+                                </div>
+                                <p class="mt-3 mb-1">Phương thức thanh toán</p>
+                                <div class="d-flex justify-content-around" id="methodPay">
+                                    <input type="radio" class="btn-check" name="paymentMethod" id="option5"
+                                           value="0" checked>
+                                    <label class="btn" for="option5">Tiền mặt</label>
+
+                                    <input type="radio" class="btn-check" name="paymentMethod" id="option6"
+                                           value="1">
+                                    <label class="btn" for="option6">Chuyển khoản</label>
+                                </div>
+                                <div class="px-3">
+                                    <select class="form-select form-select-md mt-2" name="account" id="account"
+                                            style="display: none;"
+                                            th:value="${editInvoice.account != null ? editInvoice.account.getAccNumber() : ''}">
+                                        <option value="" selected>Chọn tài khoản ngân hàng</option>
+                                        <option th:each="acc:${accList}" th:value="${acc.getAccNumber()}"
+                                                th:text="${acc.getAccOwner()+' - '+acc.getAccNumber()+' | '+acc.getBank().getBankName()}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col-md-5 pt-2">
+                                        <p>Mã hoá đơn</p>
+                                        <p>Thời gian</p>
+                                        <p>Người tạo</p>
+                                    </div>
+                                    <div class="col-md-7 pt-2 text-end">
+                                        <p th:text="${editInvoice.getCode()}"></p>
+                                        <p th:text="${#dates.format(editInvoice.getTime(), 'dd/MM/yyyy HH:mm:ss')}"></p>
+                                        <p th:text="${editInvoice.user.name}"></p>
+                                    </div>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-success w-100 mt-2">Thanh toán</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Thêm khách hàng -->
+<div class="modal fade" id="addEditCustomer" tabindex="-1" aria-labelledby="addEditCustomerLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <form th:action="@{'/admin/invoice/edit/'+${editInvoice.invoiceID}+'/customer/save'}" method="post">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: rgba(161, 58, 58, 0.5);">
+                    <p class="modal-title fs-6 fw-normal text-white" id="addEditCustomerLabel"></p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="inputCustomerID"  name="customerID" style="display: none;">
+
+                    <div class="mb-3 row">
+                        <label for="inputCustomerName" class="col-sm-3 col-form-label">Tên khách hàng<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputCustomerName" name="customerName"
+                                   onchange="customer()" autocomplete="off" required>
+                            <small id="inputNameMessage1" class="form-text text-danger" >
+                                Tên khách hàng không được bỏ trống.</small>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerPhone" class="col-sm-3 col-form-label">Số điện thoại <span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputCustomerPhone" name="phone"
+                                   onchange="customer()" autocomplete="off" required>
+                            <small id="inputPhoneMessage1" class="form-text text-danger">
+                                Nhập ít nhất một số điện thoại.</small>
+                            <small id="inputPhoneMessage" class="form-text text-danger" style="display:none;">
+                                Mỗi số điện thoại hợp lệ sẽ có độ dài từ 10 đến 11 số và chỉ dùng dấu phẩy để phân cách.</small>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerGender" class="col-sm-3 col-form-label">Giới tính<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="inputCustomerGender" name="gender" required>
+                                <option value=1>Nam</option>
+                                <option value=2>Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerDOB" class="col-sm-3 col-form-label">Ngày sinh <span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="date" class="form-control" id="inputCustomerDOB" name="dob" required onchange="customer()">
+                            <small id="inputDOBMessage1" class="form-text text-danger">
+                                Ngày sinh không được bỏ trống.</small>
+                            <small id="inputDOBMessage" class="form-text text-danger" style="display: none;"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerAddress" class="col-sm-3 col-form-label">Địa chỉ</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputCustomerAddress" name="address"
+                                   onchange="customer()" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerEmail" class="col-sm-3 col-form-label">Email</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputCustomerEmail" name="email" onchange="customer()" autocomplete="off">
+                            <small id="inputEmailMessage" class="form-text text-danger" style="display:none;">
+                                Email không hợp lệ. Vui lòng kiểm tra và nhập lại!</small>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="inputCustomerDescription" class="col-sm-3 col-form-label">Ghi chú</label>
+                        <div class="col-sm-9">
+                            <textarea type="text" class="form-control" id="inputCustomerDescription" onchange="customer()"
+                                      rows="3" name="description" autocomplete="off"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="inputCustomerStatus" class="col-sm-3 col-form-label">Trạng thái</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="inputCustomerStatus" name="isEnable">
+                                <option value=1 selected>Đang hoạt động</option>
+                                <option value=2>Không hoạt động</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="submit" class="btn btn-success btn-sm" id="saveCustomer" disabled><i class="bi bi-floppy-fill me-2"></i>Lưu</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal"><i
+                            class="bi bi-x-circle me-2"></i>Đóng
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Thông báo thành công -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-check me-2"></i>[[${messageSuccess}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<!-- Thông báo thất bại -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToastFail" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fa-regular fa-circle-xmark me-2"></i>[[${messageFail}]]</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" th:inline="javascript">
+    //Ẩn nút bán hàng
+    // const currentUrl = window.location.href;
+    // if (currentUrl.includes("/admin/invoice/edi")) {
+    //     document.getElementById("sell").style.display = "none";
+    // } else {
+    //     document.getElementById("sell").style.display = "block";
+    // }
+
+    //Search product list
+    const search = () => {
+        const searchBox = document.getElementById("search-item").value.toUpperCase();
+        const product = document.querySelectorAll(".product")
+        const pName = document.getElementsByTagName("h2")
+
+        for (let i = 0; i < pName.length; i++) {
+            let match = product[i].getElementsByTagName('h2')[0];
+            if (match) {
+                let textValue = match.textContent || match.innerHTML
+
+                if (textValue.toUpperCase().indexOf(searchBox) > -1) {
+                    product[i].style.display = "";
+                } else {
+                    product[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    $("#methodPay input").change(function (){
+        showAccInput();
+    });
+    function showAccInput(){
+        const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+        if (paymentMethod === "0"){ // Chú ý so sánh với chuỗi "0" thay vì số 0
+            $('#account').removeAttr('required');
+            $('#account').css('display', 'none'); // Ẩn phần tử
+            $('#account').val('');
+        } else {
+            $('#account').prop('required', true);
+            $('#account').css('display', 'block'); // Hiển thị phần tử
+        }
+    }
+
+    const config = {
+        decimalCharacter: ',',
+        digitGroupSeparator: '.',
+        decimalPlaces: 0,
+        showWarnings: false,
+        hoverDecimals: 0
+    };
+    function formatNumber(number) {
+        return number.toLocaleString('vi-VN');
+    }
+    const discountItemInputs = document.querySelectorAll('.discount-input');
+    discountItemInputs.forEach(input => {
+        new AutoNumeric(input, config);
+    });
+
+    const discountAllInput = new AutoNumeric(('.discountAll input'), config);
+    const cusPayInput = new AutoNumeric(('.cusPay input'), config);
+
+    const mustPay = $('.mustPay');
+    const cartTotal = $('.cart-total').text().replace(/\./g, '');
+
+    if (sessionStorage.getItem('discountAll')){
+        discountAllInput.set(sessionStorage.getItem('discountAll'));
+    }
+    if (parseFloat(cartTotal) === 0){
+        discountAllInput.set(0);
+        sessionStorage.setItem("discountAll", "0");
+    }
+
+    function updateMustPay() {
+        const discountAll = AutoNumeric.getNumber('.discountAll input');
+        if (parseFloat(discountAll) === 0) {
+            mustPay.text(formatNumber(Number(cartTotal)));
+        } else {
+            mustPay.text(formatNumber(Number(cartTotal) - parseFloat(discountAll)));
+        }
+    }
+
+    updateMustPay();
+
+    const discountAll = $('.discountAll input');
+    discountAll.on('blur', function() {
+        const discount = AutoNumeric.getNumber('.discountAll input');
+        if (isNaN(parseFloat(discount)) || discountAll.val() == null || discountAll.val().trim() === "") {
+            discountAllInput.set(0);  // Gán lại giá trị mặc định nếu không phải là số
+            return;
+        }
+        updateMustPay();
+        sessionStorage.setItem("discountAll", discount);
+    });
+
+    const cusPay = $('.cusPay input');
+    cusPay.on('blur', function() {
+        const cusPayValue = parseFloat(AutoNumeric.getNumber('.cusPay input'));
+        if (isNaN(cusPayValue) || cusPay.val() == null || cusPay.val().trim() === "") {
+            cusPayInput.set(0); // Gán lại giá trị mặc định nếu không phải là số
+            return;
+        }
+
+        const mustPayValue = parseFloat(mustPay.text().replace(/\./g, ''));
+
+        if (cusPayValue >= mustPayValue) {
+            $('.theChange').text(formatNumber(Number(cusPayValue - mustPayValue)));
+            $('.cusPay input').css('color', 'black'); // Sử dụng css() thay vì style
+        } else {
+            $('.cusPay input').css('color', 'red'); // Sử dụng css() thay vì style
+            alert("Số tiền khách trả phải lớn hơn hoặc bằng số tiền cần trả");
+        }
+    });
+
+    $('.nBtnCus').on('click', function (event){
+        event.preventDefault();
+            $('#addEditCustomerLabel').text('Thêm khách hàng');
+            $('#inputCustomerID').val('');
+            $('#inputCustomerName').val('');
+            $('#inputCustomerPhone').val('');
+            $('#inputCustomerDOB').val('');
+            $('#inputCustomerGender').val(1);
+            $('#inputCustomerAddress').val('');
+            $('#inputCustomerEmail').val('');
+            $('#inputCustomerDescription').val('');
+            $('#inputCustomerStatus').val(1);
+            $('#addEditCustomer').modal('show');
+    });
+
+    if ([[${messageSuccess}]]) {
+        bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastSuccess')).show();
+    }
+    if ([[${messageFail}]]) {
+        bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToastFail')).show();
+    }
+</script>
+<script th:src="@{/js/customer.js}"></script>
+
+</html>
